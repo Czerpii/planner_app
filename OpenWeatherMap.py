@@ -1,9 +1,11 @@
 import requests
 from settings import *
 from IWeatherProvider import*
+import ssl
 
 
-
+#wyłaczenie certyfikacji - potrzebne do działania na macos
+ssl._create_default_https_context = ssl._create_unverified_context
     
 class OpenWeaterMap(IWeatherProvider):
 
