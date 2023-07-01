@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from OpenWeatherMap import *
+from weather.OpenWeatherMap import *
 from IpapiLocation import *
 
 

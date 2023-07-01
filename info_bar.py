@@ -1,5 +1,5 @@
 from customtkinter import CTkFrame
-from WeatherWidget import *
+from weather.WeatherWidget import *
 
 
 class InfoBar(CTkFrame):

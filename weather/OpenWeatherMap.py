@@ -1,6 +1,6 @@
 import requests
 from settings import *
-from IWeatherProvider import*
+from weather.IWeatherProvider import*
 import ssl
 
 
