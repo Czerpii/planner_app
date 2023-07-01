@@ -1,5 +1,6 @@
 __pycache__/
 weather/__pycache__/
+location/__pycache__/
 location.csv
 .DS_Store
 

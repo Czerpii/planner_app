@@ -2,7 +2,7 @@ import json
 import urllib.request
 import csv
 import os
-from ILocationProvider import *
+from location.ILocationProvider import *
 
 
 
