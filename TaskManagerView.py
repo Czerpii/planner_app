@@ -1,13 +1,15 @@
 from typing import Optional, Tuple, Union
 import customtkinter as ctk
 from tkinter import ttk
-
+from ICommand import CreateNewTask
+from task_manager_reciver import *
+from invoker import Invoker
 
 
 
 #główne okno listy zadań 
 class TaskManagerMain(ctk.CTkFrame):
-    def __init__(self, parent, col, row):
+    def __init__(self, parent, col, row,):
         super().__init__(parent, fg_color="transparent")
         self.grid(column = col, row=row, sticky = "nsew")
         
@@ -58,15 +60,17 @@ class TaskManagerButtonBar(ctk.CTkFrame):
     def __init__(self, parent, col, row):
         super().__init__(parent, fg_color="transparent")
         self.grid(column = col, row=row, sticky = "nsew")
-    
+        self.invoker = Invoker()
+        self.parent = parent
+        
         #layout
         self.rowconfigure(0, weight=1, uniform='a')
         self.columnconfigure((0,1,2,3,4,5,6,7,8,9,10), weight=1, uniform='a')
         
         
         #create buttons
-        self.create_button(text = "Nowy", row=0,column=0, command=lambda: self.button_click())
-        self.create_button(text = "Usuń", row=0,column=1, command=lambda: self.button_click())
+        self.create_button(text = "Nowy", row=0,column=0, command=self.new_task_button_click)
+        self.create_button(text = "Usuń", row=0,column=1, command=self.test)
 
 
 
@@ -81,5 +85,15 @@ class TaskManagerButtonBar(ctk.CTkFrame):
                              padx =2
                              )
                       
-    def button_click(self):
-        print('przycisk wcisniety')
+    def new_task_button_click(self):
+        task = TaskManager()
+        new_task_command = CreateNewTask(task, self.parent)
+        self.invoker.set_command(new_task_command)
+        self.invoker.press_button()
+        
+    def test(self):
+        window = ctk.CTkToplevel(self)
+        window.geometry("300x400+500+200")
+        window.transient(self)
+        
+        

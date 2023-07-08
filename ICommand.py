@@ -11,6 +11,9 @@ class Command(ABC):
 
 #polecnie utworzenia nowego zadania
 class CreateNewTask(Command):
+    def __init__(self, task_manager,parent):
+        self.task_manager = task_manager
+        self.parent = parent
     def execute(self):
-        pass  
+        self.task_manager.new_task(self.parent) 
     
