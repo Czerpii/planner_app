@@ -5,6 +5,8 @@ from tkinter import PhotoImage
 from ICommand import Save
 from task_manager_reciver import *
 from invoker import Invoker
+import csv
+from collections import defaultdict
 
 
 
@@ -31,28 +33,45 @@ class TaskManagerTable(ctk.CTkFrame):
     def __init__(self, parent, col, row):
         super().__init__(parent, fg_color="transparent")
         self.grid(column = col, row=row, sticky = "nsew")
-        
+        self.task_file = 'tasks.csv'
         self.create_treeview()
-        
+        self.import_from_file()
     
     #tworzenie listy dla menadzera zadań
     def create_treeview(self):
+          
+        self.task_list = ttk.Treeview(self)
+        self.task_list['columns'] = ('task', 'description', 'deadline', 'status', 'priority','tag')
+        self.task_list.column('#0', width=0, stretch='false')
+        self.task_list.column('task', width=100)
+        self.task_list.column('description', width=200)
+        self.task_list.column('deadline',width=80)
+        self.task_list.column('status', width=100)
+        self.task_list.column('priority',width=100)
+        self.task_list.column('tag',width=80)
+    
+        self.task_list.heading('task', text='Zadanie')
+        self.task_list.heading('description', text='Opis')
+        self.task_list.heading('deadline', text='Termin')
+        self.task_list.heading('status', text='Status')
+        self.task_list.heading('priority', text='Priorytet')
+        self.task_list.heading('tag', text='Tag')
+    
+        self.task_list.pack(side='left',expand='true',fill='both')
         
-        columns = ('task','description','deadline', 'status', 'priority', 'tag')
-        treeview = ttk.Treeview(self, columns = columns, show = 'headings')
         
-        #tworzenie nagłówków
+    def import_from_file(self):
         
-        treeview.heading('task', text='Zadanie')
-        treeview.heading('description', text='Opis')
-        treeview.heading('deadline', text='Termin wykonania')
-        treeview.heading('status', text ='Status')
-        treeview.heading('priority', text='Piorytet')
-        treeview.heading('tag', text='Tag')
-        
-        
-        treeview.pack(side='left',expand='true', fill='both')   
-        
+        task_file = 'tasks.csv'
+        if os.path.exists(task_file):
+            with open(task_file, 'r', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                data = list(reader)
+                for row in data:
+                    self.task_list.insert('','end', values=list(row.values()))
+            
+            file.close()  
+       
     
 
 #klasa tworząca pasek z przyciskami
@@ -70,7 +89,7 @@ class TaskManagerButtonBar(ctk.CTkFrame):
         self.columnconfigure((0,1,2,3,4,5,6,7,8,9), weight=2, uniform='a')
         self.columnconfigure(10, weight=1, uniform='a')
         
-        #add images
+        #add images - zmienic na ctkimage
         refresh_image = PhotoImage(file= "./button_image/refresh.png")
         
         ####buttons#####
@@ -190,7 +209,7 @@ class NewTaskWindow(ctk.CTkToplevel):
         
         self.save_button = ctk.CTkButton(self.buttons_frame, text="Zapisz", command=self.save_task_button_click)
         self.save_button.pack(side='left', padx=4, fill='x', expand='true')
-        self.cancel_button = ctk.CTkButton(self.buttons_frame, text="Anuluj")
+        self.cancel_button = ctk.CTkButton(self.buttons_frame, text="Anuluj", command=lambda: self.destroy())
         self.cancel_button.pack(side='left', padx=4, fill='x', expand='true')
 
         
@@ -208,3 +227,4 @@ class NewTaskWindow(ctk.CTkToplevel):
                                  tag=self.tag_list.get())
         self.invoker.set_command(save_task_command)
         self.invoker.press_button()
+        self.destroy()

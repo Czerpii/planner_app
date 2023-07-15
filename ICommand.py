@@ -15,7 +15,7 @@ class Save(Command):
         """funkcja zapisuje podane dane do **input
 
         Args:
-            reciver (class): odbiorca funckji
+            reciver (class): odbiorca komendy
             **input (any): wszystkie podane wartości zostaną zapisane
         """
         self.reciver = reciver
