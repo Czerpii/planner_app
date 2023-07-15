@@ -16,7 +16,7 @@ class Main(ctk.CTk):
         self.change_title_bar_color()
         self.geometry_with_center(WIDTH, HEIGHT)
         self.title('')
-        self.set_icon()
+        self.iconbitmap('empty.ico')
       
 
         #tworzenie siatki głównego okna
@@ -60,12 +60,5 @@ class Main(ctk.CTk):
     def create_buttons(self):
         pass
 
-    def set_icon(self):
-        if sys.platform == 'darwin':
-            pass
-        elif sys.platform == 'win32' or 'cygwin':
-            self.iconbitmap('empty.ico')
-        
-        
 if __name__ == '__main__':
     Main()

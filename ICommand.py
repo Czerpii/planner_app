@@ -9,11 +9,18 @@ class Command(ABC):
     
     
 
-#polecnie utworzenia nowego zadania
-class CreateNewTask(Command):
-    def __init__(self, task_manager,parent):
-        self.task_manager = task_manager
-        self.parent = parent
+
+class Save(Command):
+    def __init__(self, reciver, **input):
+        """funkcja zapisuje podane dane do **input
+
+        Args:
+            reciver (class): odbiorca funckji
+            **input (any): wszystkie podane wartości zostaną zapisane
+        """
+        self.reciver = reciver
+        self.to_save = input
+        
     def execute(self):
-        self.task_manager.new_task(self.parent) 
+        self.reciver.save_task(self.to_save)
     
