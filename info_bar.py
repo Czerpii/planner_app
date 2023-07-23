@@ -1,5 +1,6 @@
 from customtkinter import CTkFrame
 from weather.WeatherWidget import *
+from CalendarWidget import CalendarView
 
 
 class InfoBar(CTkFrame):
@@ -16,6 +17,6 @@ class InfoBar(CTkFrame):
         
         #widget
         WeatherWidget(self, col = 0, row = 0)
-        
+        CalendarView(self, col = 0, row = 1, on_date_select=None)
 
     

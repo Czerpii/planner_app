@@ -6,8 +6,7 @@ from ICommand import Save
 from task_manager_reciver import *
 from invoker import Invoker
 import csv
-from collections import defaultdict
-
+from CalendarWidget import *
 
 
 #główne okno listy zadań 
@@ -24,8 +23,8 @@ class TaskManagerMain(ctk.CTkFrame):
         
         
         #wywołanie widgetów widoku
-        TaskManagerTable(self, 0, 1)
-        TaskManagerButtonBar(self,0,0)
+        self.task_manager_table_instance = TaskManagerTable(self, 0, 1)
+        TaskManagerButtonBar(self,0,0, self.task_manager_table_instance)
 
 
 #klasa tworząca tabele z listą zadań
@@ -62,6 +61,11 @@ class TaskManagerTable(ctk.CTkFrame):
         
     def import_from_file(self):
         
+        #czyszczenie treeview
+        for i in self.task_list.get_children():
+            self.task_list.delete(i)
+        
+        #dodawanie wszystkich elementów z pliku csv
         task_file = 'tasks.csv'
         if os.path.exists(task_file):
             with open(task_file, 'r', encoding='utf-8') as file:
@@ -71,19 +75,18 @@ class TaskManagerTable(ctk.CTkFrame):
                     self.task_list.insert('','end', values=list(row.values()))
             
             file.close()  
-       
     
 
 #klasa tworząca pasek z przyciskami
 class TaskManagerButtonBar(ctk.CTkFrame):
-    def __init__(self, parent, col, row):
+    def __init__(self, parent, col, row, task_manager_table_instance):
         super().__init__(parent, fg_color="transparent")
         self.grid(column = col, row=row, sticky = "nsew")
         self.invoker = Invoker()
         self.parent = parent
         
         self.toplevel_window = None
-        
+        self.task_manager_table_instance = task_manager_table_instance
         #layout
         self.rowconfigure(0, weight=1, uniform='a')
         self.columnconfigure((0,1,2,3,4,5,6,7,8,9), weight=2, uniform='a')
@@ -103,7 +106,6 @@ class TaskManagerButtonBar(ctk.CTkFrame):
         
     #create button
     def create_button(self, text, row, column, command, image):
-        
         ctk.CTkButton(self, 
                       text = text,
                       command=command,
@@ -117,7 +119,7 @@ class TaskManagerButtonBar(ctk.CTkFrame):
     #open widnow to add new task            
     def open_new_task_window(self):
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            self.toplevel_window = NewTaskWindow(self.parent)
+            self.toplevel_window = NewTaskWindow(self.parent, self.task_manager_table_instance)
         else:
             self.toplevel_window.focus()
        
@@ -125,17 +127,22 @@ class TaskManagerButtonBar(ctk.CTkFrame):
 
  
 class NewTaskWindow(ctk.CTkToplevel):
-    def __init__(self,parent):
+    def __init__(self,parent, task_manager_table_instance):
         super().__init__(parent)
-        self.geometry("300x400+700+350")
+        #centrowanie okna
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        center_x = int(screen_width/2 - 300/2)
+        center_y = int(screen_height/2 - 400/2)
+        self.geometry(f'300x400+{center_x}+{center_y}')
+        
         self.maxsize(300, 400)
         self.minsize(300, 400)
         self.transient(parent)
         self.title("Nowe zadanie")
         
-        
         self.invoker =Invoker()
-        
+        self.task_managere_table_instance = task_manager_table_instance
         #layout
         self.columnconfigure(0, weight=1, uniform="a")
         self.columnconfigure(1, weight=2, uniform='a')
@@ -184,7 +191,7 @@ class NewTaskWindow(ctk.CTkToplevel):
         self.date_entry = ctk.CTkEntry(self.date_frame_entry)
         self.date_entry.pack(side = 'left', expand = "true", fill ="x")
         
-        self.date_button = ctk.CTkButton(self.date_frame_entry, text=" ", width=25)
+        self.date_button = ctk.CTkButton(self.date_frame_entry, text=" ", width=25, command=self.open_calendar_button_click)
         self.date_button.pack(side ='left')
         
         
@@ -215,7 +222,6 @@ class NewTaskWindow(ctk.CTkToplevel):
         
 
     def save_task_button_click(self):
-        
       
         task = TaskManager()
         save_task_command = Save(task,
@@ -227,4 +233,27 @@ class NewTaskWindow(ctk.CTkToplevel):
                                  tag=self.tag_list.get())
         self.invoker.set_command(save_task_command)
         self.invoker.press_button()
+        self.task_managere_table_instance.import_from_file()
         self.destroy()
+            
+    def open_calendar_button_click(self):
+        
+        x_pos = self.date_button.winfo_rootx()
+        y_pos = self.date_button.winfo_rooty()
+        
+        top = ctk.CTkToplevel(self)
+        top.geometry(f"200x200+{x_pos}+{y_pos}")
+        
+        top.rowconfigure(0, weight=3, uniform='a')
+        top.rowconfigure(1, weight=1, uniform='a')
+        top.columnconfigure(0, weight=1, uniform='a')
+        
+        self.date_display = CurrentDateWidget(top, col=0,row=1, on_date_chosen = self.set_date_entry)
+        self.cal = CalendarView(top, col=0, row=0, on_date_select=self.date_display.update_date)
+        self.date_display.close_window
+        
+    def set_date_entry(self, date):
+        self.date_entry.insert(0,date)
+        
+    
+    

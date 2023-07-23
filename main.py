@@ -8,7 +8,7 @@ except:
 
 from info_bar import *
 from buttons_bar import *
-from TaskManagerView import *
+from TaskManagerView import TaskManagerMain
 
 class Main(ctk.CTk):
     def __init__(self):
