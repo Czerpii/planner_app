@@ -1,29 +1,25 @@
-from tkinter import *
-from tkinter import ttk
+import customtkinter
 
-ws = Tk()
-ws.title('PythonGuides')
-ws.geometry('400x300')
-ws['bg']='#fb0'
+class MyTabView(customtkinter.CTkTabview):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
 
-tv = ttk.Treeview(ws)
-tv['columns']=('Rank', 'Name', 'Badge')
-tv.column('#0', width=0, stretch=NO)
-tv.column('Rank', anchor=CENTER, width=80)
-tv.column('Name', anchor=CENTER, width=80)
-tv.column('Badge', anchor=CENTER, width=80)
+        # create tabs
+        self.add("tab 1")
+        self.add("tab 2")
 
-tv.heading('#0', text='', anchor=CENTER)
-tv.heading('Rank', text='Id', anchor=CENTER)
-tv.heading('Name', text='rank', anchor=CENTER)
-tv.heading('Badge', text='Badge', anchor=CENTER)
-
-tv.insert(parent='', index=0, iid=0, text='', values=('1','Vineet','Alpha'))
-tv.insert(parent='', index=1, iid=1, text='', values=('2','Anil','Bravo'))
-tv.insert(parent='', index=2, iid=2, text='', values=('3','Vinod','Charlie'))
-tv.insert(parent='', index=3, iid=3, text='', values=('4','Vimal','Delta'))
-tv.insert(parent='', index=4, iid=4, text='', values=('5','Manjeet','Echo'))
-tv.pack()
+        # add widgets on tabs
+        self.label = customtkinter.CTkLabel(master=self.tab("tab 1"))
+        self.label.grid(row=0, column=0, padx=20, pady=10)
 
 
-ws.mainloop()
+class App(customtkinter.CTk):
+    def __init__(self):
+        super().__init__()
+
+        self.tab_view = MyTabView(master=self)
+        self.tab_view.grid(row=0, column=0, padx=20, pady=20)
+
+
+app = App()
+app.mainloop()

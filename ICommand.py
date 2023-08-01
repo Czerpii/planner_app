@@ -24,3 +24,12 @@ class Save(Command):
     def execute(self):
         self.reciver.save_task(self.to_save)
     
+
+class Delete(Command):
+    def __init__(self, reciver, input):
+        
+        self.reciver = reciver
+        self.to_delete = input
+    
+    def execute(self):
+        self.reciver.delete_task(self.to_delete)

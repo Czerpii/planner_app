@@ -18,6 +18,7 @@ class Main(ctk.CTk):
         self.title('')
         self.iconbitmap('empty.ico')
       
+      
 
         #tworzenie siatki głównego okna
         self.columnconfigure(0, weight=5, uniform='a')
@@ -34,7 +35,7 @@ class Main(ctk.CTk):
         InfoBar(self, col= 1, row=0, rowspan =2)
         ButtonsBar(self, 0,0)
         TaskManagerMain(self,0,1)
-         
+        
         self.mainloop()
         
        
