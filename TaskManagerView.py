@@ -43,6 +43,7 @@ class TaskManagerMain(ctk.CTkFrame):
     
     def import_tasks(self):
         task_file = './task_file/tasks.csv'
+        data = []
         if os.path.exists(task_file):
             with open(task_file, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file)
