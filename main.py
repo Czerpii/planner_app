@@ -16,8 +16,12 @@ class Main(ctk.CTk):
         self.change_title_bar_color()
         self.geometry_with_center(WIDTH, HEIGHT)
         self.title('')
-        self.iconbitmap('empty.ico')
-      
+        
+        try:
+            self.iconbitmap('./empty.ico')
+        except: 
+            print("Błędna ścieżka")
+            pass
       
 
         #tworzenie siatki głównego okna
