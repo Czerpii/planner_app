@@ -14,6 +14,10 @@ class TaskManagerMain(ctk.CTkFrame):
         
         #variables
         self.view_state = "table"
+        self.status_var_0 = ctk.BooleanVar(value='False')
+        self.status_var_1 = ctk.BooleanVar(value='False')
+        self.status_var_2 = ctk.BooleanVar(value='False')
+        self.status_var_3 = ctk.BooleanVar(value='False')
         
         
         #layout
@@ -48,7 +52,7 @@ class TaskManagerMain(ctk.CTkFrame):
             with open(task_file, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file)
                 data = list(reader)
-                file.close()
+            file.close()
         return data   
     
     def import_all_status(self):
@@ -72,8 +76,7 @@ class TaskManagerTable(ctk.CTkFrame):
         self.main_task_manager = main_task_manager_instance
         self.create_treeview()
         self.add_to_treeview()
-
-    
+        
     #tworzenie listy dla menadzera zadań
     def create_treeview(self):
         style = ttk.Style()
@@ -261,6 +264,9 @@ class TaskManagerButtonBar(ctk.CTkFrame):
         self.task_manager_main.change_view()
     
     def status_selection_button_click(self):
+        
+        status = self.task_manager_main.import_all_status()
+        
         self.status_top = ctk.CTkToplevel(self.task_manager_main)
         x_pos = self.selection_button.winfo_rootx()
         y_pos = self.selection_button.winfo_rooty()
@@ -269,15 +275,26 @@ class TaskManagerButtonBar(ctk.CTkFrame):
         self.status_top.overrideredirect(True)
         self.status_top.transient(self)
         
-        status = self.task_manager_main.import_all_status()
-        
-        print(status)
-        #bind
         self.status_top.bind("<Leave>", self.close_top)
         
-        for i in status:
-            self.checkbox = ctk.CTkCheckBox(self.status_top, text=i[0]).pack(expand='true', fill='x')
-        
+        self.checkbox_1 = ctk.CTkCheckBox(self.status_top,
+                                          text=status[0][0],
+                                          variable = self.task_manager_main.status_var_0,
+                                          onvalue = True,
+                                          offvalue = False,
+                                          ).pack(expand='true', fill='x')
+        self.checkbox_2 = ctk.CTkCheckBox(self.status_top,
+                                          text=status[1][0],
+                                          variable = self.task_manager_main.status_var_1,
+                                          ).pack(expand='true', fill='x')
+        self.checkbox_3 = ctk.CTkCheckBox(self.status_top,
+                                          text=status[2][0],
+                                          variable = self.task_manager_main.status_var_2,
+                                          ).pack(expand='true', fill='x')
+        self.checkbox_4 = ctk.CTkCheckBox(self.status_top,
+                                          text=status[3][0],
+                                          variable = self.task_manager_main.status_var_3
+                                          ).pack(expand='true', fill='x')
         
         
 
