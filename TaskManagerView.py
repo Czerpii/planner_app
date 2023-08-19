@@ -7,6 +7,17 @@ from AddNewTask import *
 from ICommand import Delete
 from invoker import Invoker
         
+###colors### 
+#tiles
+FRAME_TILES = "#1b2127"
+TILES = "#303742"
+TILES_HOVER = "#6e737b"
+
+#priority color
+HIGH_PRIORITY = '#a90205'
+MEDIUM_PRIORITY = '#e6b41d' 
+LOW_PRIORITY = '#8d9214'
+     
 class TaskManagerMain(ctk.CTkFrame):
     def __init__(self, parent, col, row,):
         super().__init__(parent, fg_color="transparent")
@@ -14,10 +25,10 @@ class TaskManagerMain(ctk.CTkFrame):
         
         #variables
         self.view_state = "table"
-        self.status_var_0 = ctk.BooleanVar(value='False')
-        self.status_var_1 = ctk.BooleanVar(value='False')
-        self.status_var_2 = ctk.BooleanVar(value='False')
-        self.status_var_3 = ctk.BooleanVar(value='False')
+        self.status_var_not_started = ctk.BooleanVar(value='True')
+        self.status_var_in_progress = ctk.BooleanVar(value='True')
+        self.status_var_end = ctk.BooleanVar(value='True')
+        self.status_var_archived = ctk.BooleanVar(value='True')
         
         
         #layout
@@ -142,66 +153,147 @@ class TaskManagerTiles(ctk.CTkFrame):
     
         # self.create_tile()
         self.create_status_frame()
+        self.create_tiles()
+       
         
+    def create_tiles(self):
+       
+        data_dict = self.task_manager_main.import_tasks()
+        item_amount = len(data_dict)
+        
+        status_to_frame = {
+            'Nie rozpoczęto': self.status_frame_not_started,
+            'W trakcie': self.status_frame_in_progress,
+            'Zakończony': self.status_frame_end,
+            'Zarchiwizowane': self.status_frame_archived
+        }
 
-    def create_tile(self):
-        tile_frame = ctk.CTkFrame(self)
+        priority_to_color = {
+            'Wysoki': HIGH_PRIORITY,
+            'Średni': MEDIUM_PRIORITY,
+            'Niski': LOW_PRIORITY
+        }
+
+        for item in data_dict:
+            parent = status_to_frame.get(item['status'], None)
+            color = priority_to_color.get(item['priority'], None)
+            
+            if parent:  # Sprawdź, czy znaleziono odpowiednią ramkę
+                TilesCreator(parent, item['title'], item['priority'], item['deadline'], color)
+
+    def new_task_tile(self, title, status, priority, deadline):
+         
+        status_to_frame = {
+            'Nie rozpoczęto': self.status_frame_not_started,
+            'W trakcie': self.status_frame_in_progress,
+            'Zakończony': self.status_frame_end,
+            'Zarchiwizowane': self.status_frame_archived
+        }
+
+        priority_to_color = {
+            'Wysoki': HIGH_PRIORITY,
+            'Średni': MEDIUM_PRIORITY,
+            'Niski': LOW_PRIORITY
+        }
         
-        tile_frame.columnconfigure(0, weight=1, uniform="a")
-        tile_frame.columnconfigure(1, weight=2, uniform='a')
-        tile_frame.rowconfigure(0, weight=1, uniform='a')
-        tile_frame.rowconfigure((1,2,3,4,5,6), weight=1, uniform='a')
+        parent = status_to_frame[status]
+        try:
+            color = priority_to_color[priority]
+        except:
+            color = None
+        
+        TilesCreator(parent,title, priority, deadline, color)  
+             
+    def create_status_frame(self):
+        self.status_frame_not_started = ctk.CTkScrollableFrame(self, fg_color=FRAME_TILES)
+        ctk.CTkLabel(self.status_frame_not_started, text="Nie rozpoczęte").pack()
+        self.status_frame_not_started.pack(side='left', expand ='true', fill="both", padx=3)
+        
+        
+        self.status_frame_in_progress = ctk.CTkScrollableFrame(self, fg_color=FRAME_TILES)
+        ctk.CTkLabel(self.status_frame_in_progress, text="W trakcie").pack()
+        self.status_frame_in_progress.pack(side='left', expand ='true', fill="both", padx=3)
+        
+        
+        self.status_frame_end = ctk.CTkScrollableFrame(self, fg_color=FRAME_TILES)
+        ctk.CTkLabel(self.status_frame_end, text="Zakończone").pack()
+        self.status_frame_end.pack(side='left', expand ='true', fill="both", padx=3)
+        
+        
+        self.status_frame_archived = ctk.CTkScrollableFrame(self, fg_color=FRAME_TILES)
+        ctk.CTkLabel(self.status_frame_archived, text="Zarchiwizowane").pack()
+        self.status_frame_archived.pack(side='left', expand ='true', fill="both", padx=3)
+       
+    def create_frame(self, frame, status):
+        status = status.get()
+        frame = frame
+        if status == True:
+            frame.pack(side='left', expand ='true', fill="both", padx=3)   
+        else: 
+            frame.pack_forget()
+            
+
+
+class TilesCreator(ctk.CTkFrame):
+    def __init__(self, parent, title_name, priority_name, due_to, color):
+        super().__init__(parent, fg_color=TILES)
+        self.pack(side='top', fill='x', pady=5)
+        self.update_idletasks()
+        
+        self.parent = parent
+        self.columnconfigure((0,1), weight=1, uniform='a')
+        self.rowconfigure(0, weight=2, uniform='a')
+        self.rowconfigure(1, weight=1, uniform='a')
+        # self.grid_propagate(False)
         
         self.name_font = ctk.CTkFont(family="Abril Fatface", size=20, weight="bold")
         
-        title_label = ctk.CTkLabel(tile_frame,
-                                    text="Nazwa",
-                                    font=self.name_font,
-                                    corner_radius=5,
-                                    fg_color=ENTRY_FG,
-                                    )  
-        title_label.grid(row=0, column=0, columnspan = 2, sticky='nsew', pady=2)
-        
-        self.create_labels(parent=tile_frame, col=0, row=1, text="Opis zadania")
-
-        self.create_labels(parent=tile_frame, col=0, row=3, text='Termin')
-
-        self.create_labels(parent=tile_frame, col=0, row=2, text="Status")
-
-        self.create_labels(parent=tile_frame, col=0, row=4, text="Priotytet")
-
-        self.create_labels(parent=tile_frame, col=0, row=5, text="Tag")
-        
-        self.create_labels(parent=tile_frame, col=1, row=1, text="Opis zadania")
-
-        self.create_labels(parent=tile_frame, col=1, row=3, text='Termin')
-
-        self.create_labels(parent=tile_frame, col=1, row=2, text="Status")
-
-        self.create_labels(parent=tile_frame, col=1, row=4, text="Priotytet")
-
-        self.create_labels(parent=tile_frame, col=1, row=5, text="Tag")
-
         
         
-        tile_frame.pack()
+        title_label = ctk.CTkLabel(self, text=title_name,
+                                wraplength=self.winfo_width(), 
+                                justify='left',
+                                font=self.name_font)
+        title_label.grid(column=0, row=0, columnspan=2, sticky='nw', pady=5, padx=5)
+        
+        
+        self.priority_label = ctk.CTkLabel(self, text=priority_name, fg_color=color, corner_radius=5)
+        self.priority_label.grid(column=0, row=1, sticky='nsew', padx=5, pady=2)
+        
+        due_label = ctk.CTkLabel(self, text=due_to)
+        due_label.grid(column=1, row=1, sticky='nsew', padx=5,pady=2)
 
-    def create_labels(self, parent, col, row, text):
-        ctk.CTkLabel(parent,
-                     text=text,
-                     anchor='center',
-                     corner_radius=5, 
-                     fg_color=LABEL_FG,
-                     text_color=LABEL_TEXT,
-                     ).grid(column=col, row=row, sticky='nsew', pady=2, padx=2)
+        self.priority_list = self.priority_label
+
+        #binds
+        self.bind("<Enter>", self.on_enter)
+        self.bind("<Leave>", self.on_leave)
+        self.bind("<Button-1>", self.on_click)
+        
+        title_label.bind("<Enter>", self.on_enter)
+        title_label.bind("<Leave>", self.on_leave)
+        title_label.bind("<Button-1>", self.on_click)
+        
+        self.priority_label.bind("<Enter>", self.on_enter)
+        self.priority_label.bind("<Leave>", self.on_leave)
+        self.priority_label.bind("<Button-1>", self.on_click_priority)
+        
+        due_label.bind("<Enter>", self.on_enter)
+        due_label.bind("<Leave>", self.on_leave)
+        due_label.bind("<Button-1>", self.on_click)
+        
+    def on_enter(self, event):
+        self.configure(fg_color=TILES_HOVER)
     
-    def create_status_frame(self):
-        status = self.task_manager_main.import_all_status()
-        for i in status:
-            status_frame = ctk.CTkFrame(self)
-            ctk.CTkLabel(status_frame, text=i[0]).pack()
-            status_frame.pack(side='left', expand ='true', fill="both", padx=3)
+    def on_leave(self, event):
+        self.configure(fg_color=TILES)
         
+    def on_click_priority(self, event):
+       AddTaskParameters(parent = self, data_name='priority', new_task_window_instance=self)
+       
+    
+    def on_click(self, event):  
+        pass
 #klasa tworząca pasek z przyciskami
 class TaskManagerButtonBar(ctk.CTkFrame):
     def __init__(self, parent, col, row, task_manager_table, task_manager_main, task_manager_tiles):
@@ -253,7 +345,7 @@ class TaskManagerButtonBar(ctk.CTkFrame):
     #obsługa przycisków           
     def open_new_task_window(self):
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            self.toplevel_window = NewTaskWindow(self.parent, self.task_manager_table)
+            self.toplevel_window = NewTaskWindow(self.parent, self.task_manager_table, self.task_manager_tiles)
         else:
             self.toplevel_window.focus()
 
@@ -279,21 +371,29 @@ class TaskManagerButtonBar(ctk.CTkFrame):
         
         self.checkbox_1 = ctk.CTkCheckBox(self.status_top,
                                           text=status[0][0],
-                                          variable = self.task_manager_main.status_var_0,
+                                          variable = self.task_manager_main.status_var_not_started,
+                                          command = lambda: self.task_manager_tiles.create_frame(self.task_manager_tiles.status_frame_not_started,
+                                                                                                 self.task_manager_main.status_var_not_started),
                                           onvalue = True,
                                           offvalue = False,
                                           ).pack(expand='true', fill='x')
         self.checkbox_2 = ctk.CTkCheckBox(self.status_top,
                                           text=status[1][0],
-                                          variable = self.task_manager_main.status_var_1,
+                                          variable = self.task_manager_main.status_var_in_progress,
+                                          command = lambda: self.task_manager_tiles.create_frame(self.task_manager_tiles.status_frame_in_progress,
+                                                                                                 self.task_manager_main.status_var_in_progress),
                                           ).pack(expand='true', fill='x')
         self.checkbox_3 = ctk.CTkCheckBox(self.status_top,
                                           text=status[2][0],
-                                          variable = self.task_manager_main.status_var_2,
+                                          variable = self.task_manager_main.status_var_end,
+                                          command = lambda: self.task_manager_tiles.create_frame(self.task_manager_tiles.status_frame_end,
+                                                                                                 self.task_manager_main.status_var_end),
                                           ).pack(expand='true', fill='x')
         self.checkbox_4 = ctk.CTkCheckBox(self.status_top,
                                           text=status[3][0],
-                                          variable = self.task_manager_main.status_var_3
+                                          variable = self.task_manager_main.status_var_archived,
+                                          command = lambda: self.task_manager_tiles.create_frame(self.task_manager_tiles.status_frame_archived,
+                                                                                                 self.task_manager_main.status_var_archived),
                                           ).pack(expand='true', fill='x')
         
         
