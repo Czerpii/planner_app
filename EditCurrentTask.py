@@ -34,7 +34,7 @@ DESC_FG = "#282828"
 
 
 class EditTaskWindow(ctk.CTkToplevel):
-    def __init__(self, parent, task_data, selected_item_id):
+    def __init__(self, parent, task_manager_table, task_manager_tiles, task_data, selected_item_id):
         super().__init__(parent, fg_color=TOP_LEVEL_FG)
         # centrowanie okna
         screen_width = self.winfo_screenwidth()
@@ -51,7 +51,8 @@ class EditTaskWindow(ctk.CTkToplevel):
         
 
         self.invoker = Invoker()
-        self.task_manager_table_instance = parent
+        self.task_manager_table = task_manager_table
+        self.task_manager_tiles = task_manager_tiles
         # self.task_manager_tiles_instance = task_manager_tiles_instance
         self.add_task = AddTaskParameters
         self.task_data = task_data
@@ -176,7 +177,8 @@ class EditTaskWindow(ctk.CTkToplevel):
         edit_task_command = Edit(task, **params)
         self.invoker.set_command(edit_task_command)
         self.invoker.press_button()
-        self.task_manager_table_instance.edit_choosen_task(self.selected_item_id, **params)
+        self.task_manager_table.edit_choosen_task(self.selected_item_id, **params)
+        self.task_manager_tiles.edit_tile(self.selected_item_id, params['title'], params['priority'], params['deadline'])
         
         self.destroy()
 

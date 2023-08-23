@@ -73,12 +73,7 @@ class TaskManagerMain(ctk.CTkFrame):
                 status.append(row)
             file.close() 
         return status
-    
-    def edit_choosen_task(self, item_id, **values):
-        values_list = list(values.values())
-        TaskManagerTable.task_list.item(item_id, values=values_list)
-        
-    
+ 
 
 #klasa tworząca tabele z listą zadań
 class TaskManagerTable(ctk.CTkFrame):
@@ -88,7 +83,7 @@ class TaskManagerTable(ctk.CTkFrame):
         self.task_file = './task_file/tasks.csv'
         
         self.invoker = Invoker()
-        self.main_task_manager = main_task_manager_instance
+        self.task_manager_main = main_task_manager_instance
         self.create_treeview()
         self.add_to_treeview()
         
@@ -132,10 +127,10 @@ class TaskManagerTable(ctk.CTkFrame):
         #czyszczenie treeview
         for i in self.task_list.get_children():
             self.task_list.delete(i)
-        data = self.main_task_manager.import_tasks()
+        data = self.task_manager_main.import_tasks()
         
         for row in data:
-            self.task_list.insert('','end', values=list(row.values()))
+            self.task_list.insert('','end', values=list(row.values()), iid=row['id'])
     
     def remove_selected_task(self):
         selected_task_id = self.task_list.selection()[0]
@@ -150,13 +145,17 @@ class TaskManagerTable(ctk.CTkFrame):
         self.invoker.press_button()
         
     def on_select(self, event):
-        selected_item = self.task_list.selection()[0]
-        if selected_item:
-            item = selected_item
+        selected_item_id = self.task_list.selection()[0]
+        if selected_item_id:
+            item = selected_item_id
             values = self.task_list.item(item, "values")
             keys = self.task_list["columns"]
             selected_dictionary = dict(zip(keys, values))
-            EditTaskWindow(self, selected_dictionary, selected_item)
+            EditTaskWindow(self,
+                           self,
+                           self.task_manager_main.task_manager_tiles,
+                           selected_dictionary,
+                           selected_item_id)
             
     def edit_choosen_task(self, item_id, **values):
         values_list = list(values.values())
@@ -170,17 +169,18 @@ class TaskManagerTiles(ctk.CTkFrame):
     
         #instances
         self.task_manager_main = task_manager_main
-    
+        
+        #tiles storage
+        self.tiles = {}
+
         # self.create_tile()
         self.create_status_frame()
         self.create_tiles()
-       
-        
+           
     def create_tiles(self):
        
         data_dict = self.task_manager_main.import_tasks()
         item_amount = len(data_dict)
-        
         status_to_frame = {
             'Nie rozpoczęto': self.status_frame_not_started,
             'W trakcie': self.status_frame_in_progress,
@@ -198,11 +198,10 @@ class TaskManagerTiles(ctk.CTkFrame):
             parent = status_to_frame.get(item['status'], None)
             color = priority_to_color.get(item['priority'], None)
             if parent:  # Sprawdź, czy znaleziono odpowiednią ramkę
-                TilesCreator(parent, item['title'], item['priority'], item['deadline'], color, item['id'])
-
+                tile = TilesCreator(parent, self, item['title'], item['priority'], item['deadline'], color, item['id'])
+                self.tiles[item['id']] = tile
+                
     def new_task_tile(self, title, status, priority, deadline, id_task):
-        
-        
         status_to_frame = {
             'Nie rozpoczęto': self.status_frame_not_started,
             'W trakcie': self.status_frame_in_progress,
@@ -220,10 +219,13 @@ class TaskManagerTiles(ctk.CTkFrame):
         try:
             color = priority_to_color[priority]
         except:
-            color = None
+            color = TILES
         
-        TilesCreator(parent,title, priority, deadline, color, id_task)  
-             
+        tile = TilesCreator(parent,self,title, priority, deadline, color, id_task)
+        self.tiles[str(id_task)] = tile
+       
+
+         
     def create_status_frame(self):
         self.status_frame_not_started = ctk.CTkScrollableFrame(self, fg_color=FRAME_TILES)
         ctk.CTkLabel(self.status_frame_not_started, text="Nie rozpoczęte").pack()
@@ -252,11 +254,40 @@ class TaskManagerTiles(ctk.CTkFrame):
         else: 
             frame.pack_forget()
             
+    def edit_tile(self, id_task, title, priority, due_to):
+        priority_to_color = {
+            'Wysoki': HIGH_PRIORITY,
+            'Średni': MEDIUM_PRIORITY,
+            'Niski': LOW_PRIORITY
+        }
+        
+        try:
+            color = priority_to_color[priority]
+        except:
+            color = TILES
+            
+        tile = self.tiles.get(id_task)
+        tile.title_label.configure(text=title)
+        tile.priority_label.configure(text=priority, fg_color = color)
+        tile.due_label.configure(text=due_to)
 
+    def on_select(self, id_task):
+        selected_task = []
+        for row in self.task_manager_main.import_tasks():
+            if row['id'] == id_task:
+                selected_task = row
+        
+        EditTaskWindow(self,
+                       self.task_manager_main.task_manager_table,
+                       self,
+                       selected_task,
+                       id_task)
+        
 class TilesCreator(ctk.CTkFrame):
-    def __init__(self, parent, title_name, priority_name, due_to, color, id_task):
+    def __init__(self, parent, task_manager_tiles, title_name, priority_name, due_to, color, id_task):
         super().__init__(parent, fg_color=TILES)
         self.pack(side='top', fill='x', pady=5)
+        
         self.update_idletasks()
         
         self.parent = parent
@@ -264,26 +295,26 @@ class TilesCreator(ctk.CTkFrame):
         self.rowconfigure(0, weight=2, uniform='a')
         self.rowconfigure(1, weight=1, uniform='a')
         # self.grid_propagate(False)
-        
+        self.task_manager_tiles = task_manager_tiles
         self.id_task_tile = id_task
-        # print(self.id_task_tile)
+        
         
         self.name_font = ctk.CTkFont(family="Abril Fatface", size=20, weight="bold")
         
         
         
-        title_label = ctk.CTkLabel(self, text=title_name,
+        self.title_label = ctk.CTkLabel(self, text=title_name,
                                 wraplength=self.winfo_width(), 
                                 justify='left',
                                 font=self.name_font)
-        title_label.grid(column=0, row=0, columnspan=2, sticky='nw', pady=5, padx=5)
+        self.title_label.grid(column=0, row=0, columnspan=2, sticky='nw', pady=5, padx=5)
         
         
         self.priority_label = ctk.CTkLabel(self, text=priority_name, fg_color=color, corner_radius=5)
         self.priority_label.grid(column=0, row=1, sticky='nsew', padx=5, pady=2)
         
-        due_label = ctk.CTkLabel(self, text=due_to)
-        due_label.grid(column=1, row=1, sticky='nsew', padx=5,pady=2)
+        self.due_label = ctk.CTkLabel(self, text=due_to)
+        self.due_label.grid(column=1, row=1, sticky='nsew', padx=5,pady=2)
 
         self.priority_list = self.priority_label
 
@@ -292,17 +323,17 @@ class TilesCreator(ctk.CTkFrame):
         self.bind("<Leave>", self.on_leave)
         self.bind("<Button-1>", self.on_click)
         
-        title_label.bind("<Enter>", self.on_enter)
-        title_label.bind("<Leave>", self.on_leave)
-        title_label.bind("<Button-1>", self.on_click)
+        self.title_label.bind("<Enter>", self.on_enter)
+        self.title_label.bind("<Leave>", self.on_leave)
+        self.title_label.bind("<Button-1>", self.on_click)
         
         self.priority_label.bind("<Enter>", self.on_enter)
         self.priority_label.bind("<Leave>", self.on_leave)
         self.priority_label.bind("<Button-1>", self.on_click_priority)
         
-        due_label.bind("<Enter>", self.on_enter)
-        due_label.bind("<Leave>", self.on_leave)
-        due_label.bind("<Button-1>", self.on_click)
+        self.due_label.bind("<Enter>", self.on_enter)
+        self.due_label.bind("<Leave>", self.on_leave)
+        self.due_label.bind("<Button-1>", self.on_click)
         
     def on_enter(self, event):
         self.configure(fg_color=TILES_HOVER)
@@ -314,7 +345,7 @@ class TilesCreator(ctk.CTkFrame):
        AddTaskParameters(parent = self, data_name='priority', new_task_window_instance=self)
        
     def on_click(self, event):  
-        print(self.id_task_tile)
+        self.task_manager_tiles.on_select(self.id_task_tile)
     
 #klasa tworząca pasek z przyciskami
 class TaskManagerButtonBar(ctk.CTkFrame):
