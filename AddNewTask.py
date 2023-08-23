@@ -1,6 +1,8 @@
 import csv
 import os
 
+import random
+
 import customtkinter as ctk
 
 from CalendarWidget import CalendarDateEntry
@@ -86,7 +88,7 @@ class NewTaskWindow(ctk.CTkToplevel):
         self.create_labels(col=0, row=3, text='Termin')
 
         self.date_button = ctk.CTkButton(self,
-                                         text="Wybierz",
+                                         text="Bezterminowo",
                                          command=self.open_calendar_button_click,
                                          fg_color=BUTTON_FG,
                                          hover_color=BUTTON_HOVER,
@@ -160,21 +162,26 @@ class NewTaskWindow(ctk.CTkToplevel):
         AddTaskParameters(parent=self, data_name="priority", new_task_window_instance=self)
 
     def save_task_button_click(self):
+        params = {
+            'id': random.randint(1,10000),
+            'title': self.title_entry.get(),
+            'description': self.desc_textbox.get(index1="0.0", index2="end"),
+            'deadline': self.date_button.cget("text"),
+            'status': self.status_list.cget("text"),
+            'priority': self.priority_list.cget("text"),
+            'tag': self.tag_list.cget("text")
+        }
         task = TaskManager()
-        save_task_command = Save(task,
-                                 title=self.title_entry.get(),
-                                 description=self.desc_textbox.get(index1="0.0", index2="end"),
-                                 deadline=self.date_button.cget("text"),
-                                 status=self.status_list.cget("text"),
-                                 priority=self.priority_list.cget("text"),
-                                 tag=self.tag_list.cget("text"))
+        save_task_command = Save(task, **params)
         self.invoker.set_command(save_task_command)
         self.invoker.press_button()
         self.task_manager_table_instance.add_to_treeview()
-        self.task_manager_tiles_instance.new_task_tile(title=self.title_entry.get(),
-                                                       status=self.status_list.cget("text"),
-                                                        priority=self.priority_list.cget("text"),
-                                                        deadline=self.date_button.cget("text"))
+        self.task_manager_tiles_instance.new_task_tile(title=params['title'],
+                                                       status=params['status'],
+                                                        priority=params['priority'],
+                                                        deadline=params['deadline'],
+                                                        id_task = params['id']
+                                                        )
         self.destroy()
 
     def open_calendar_button_click(self):

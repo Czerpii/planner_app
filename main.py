@@ -9,7 +9,7 @@ except:
 
 from info_bar import *
 from buttons_bar import *
-from TaskManagerView import TaskManagerMain
+from TaskManager import TaskManagerMain
 
 
 class Main(ctk.CTk):
@@ -18,6 +18,7 @@ class Main(ctk.CTk):
         self.change_title_bar_color()
         self.geometry_with_center(WIDTH, HEIGHT)
         self.title('')
+        
         try:
             self.iconbitmap('./empty.ico')
         except:

@@ -33,3 +33,13 @@ class Delete(Command):
     
     def execute(self):
         self.reciver.delete_task(self.to_delete)
+        
+        
+class Edit(Command):
+    def __init__(self, reciver, **input):
+        
+        self.reciver = reciver
+        self.to_edit = input
+    
+    def execute(self):
+        self.reciver.edit_task(self.to_edit)
