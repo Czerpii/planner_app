@@ -74,6 +74,7 @@ class EditTaskWindow(ctk.CTkToplevel):
                                         fg_color=ENTRY_FG,
                                         border_width=0
                                         )
+        
         self.title_entry.insert(0, self.task_data['title'])
         self.title_entry.grid(row=0, column=0, columnspan=2, sticky='nsew', pady=2)
         
@@ -178,7 +179,7 @@ class EditTaskWindow(ctk.CTkToplevel):
         self.invoker.set_command(edit_task_command)
         self.invoker.press_button()
         self.task_manager_table.edit_choosen_task(self.selected_item_id, **params)
-        self.task_manager_tiles.edit_tile(self.selected_item_id, params['title'], params['priority'], params['deadline'])
+        self.task_manager_tiles.edit_tile(self.selected_item_id, params['title'], params['priority'], params['deadline'], params['status'])
         
         self.destroy()
 
