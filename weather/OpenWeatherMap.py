@@ -33,6 +33,9 @@ class OpenWeaterMap(IWeatherProvider):
                     
                 if key == 'weather':
                     today_data['description'] = value[0]['description']
+                    today_data['weather_main'] = value[0]['main']
+                    today_data['weather_ico'] = value[0]['icon']
             
         return today_data    
+        
         
