@@ -22,27 +22,28 @@ class TaskManagerMain(ctk.CTkFrame):
     def __init__(self, parent, col, row,):
         super().__init__(parent, fg_color="transparent")
         self.grid(column = col, row=row, sticky = "nsew")
-        
-        #variables
+
+        self.initialize_variables()
+        self.configure_layout()
+        self.initialize_widgets()
+
+    def initialize_variables(self):
         self.view_state = "table"
         self.status_var_not_started = ctk.BooleanVar(value='True')
         self.status_var_in_progress = ctk.BooleanVar(value='True')
         self.status_var_end = ctk.BooleanVar(value='True')
         self.status_var_archived = ctk.BooleanVar(value='True')
-        
-        
-        #layout
-        self.columnconfigure(0, weight=1, uniform='a' )
+
+    def configure_layout(self):
+        self.columnconfigure(0, weight=1, uniform='a')
         self.rowconfigure(0, weight=1, uniform="a")
         self.rowconfigure(1, weight=20, uniform="a")
-        
-        
-        #wywołanie widgetów widoku
+
+    def initialize_widgets(self):
         self.task_manager_table = TaskManagerTable(self, 0, 1, self)
         self.task_manager_tiles = TaskManagerTiles(self, 0, 1, self)
         self.task_manager_tiles.grid_remove()
-        
-        TaskManagerButtonBar(self,0,0, self.task_manager_table, self, self.task_manager_tiles)
+        TaskManagerButtonBar(self, 0, 0, self.task_manager_table, self, self.task_manager_tiles)
 
     def change_view(self):
         if self.view_state == "table":
@@ -75,87 +76,80 @@ class TaskManagerMain(ctk.CTkFrame):
         return status
  
 
-#klasa tworząca tabele z listą zadań
 class TaskManagerTable(ctk.CTkFrame):
     def __init__(self, parent, col, row, main_task_manager_instance):
         super().__init__(parent, fg_color="transparent")
-        self.grid(column = col, row=row, sticky = "nsew")
-        self.task_file = './task_file/tasks.csv'
+        self.grid(column=col, row=row, sticky="nsew")
         
+        self.initialize_variables(main_task_manager_instance)
+        self.create_treeview()
+        self.populate_treeview()
+        self.bind_events()
+
+    def initialize_variables(self, main_task_manager_instance):
+        self.task_file = './task_file/tasks.csv'
         self.invoker = Invoker()
         self.task_manager_main = main_task_manager_instance
-        self.create_treeview()
-        self.add_to_treeview()
-        
-        self.task_list.bind("<Double-1>", self.open_editor)
-        
-    #tworzenie listy dla menadzera zadań
+
     def create_treeview(self):
+        self.configure_treeview_style()
+        self.task_list = ttk.Treeview(self, columns=('id', 'title', 'description', 'deadline', 'status', 'priority', 'tag'))
+        self.configure_treeview_columns()
+        self.configure_treeview_headings()
+        self.task_list.pack(side='left', expand='true', fill='both')
+
+    def configure_treeview_style(self):
         style = ttk.Style()
-        style.configure("Treeview",
-                        font=('Helvetica', 10),  # ustawienie czcionki
-                        foreground="black",  # ustawienie koloru czcionki
-                        background="lightblue",  # ustawienie koloru tła
-                        fieldbackground="lightblue")  # ustawienie koloru tła dla pól
-        style.configure("Treeview.Heading",
-                        background="blue",  # ustawienie koloru tła nagłówka
-                        foreground="black")  # ustawienie koloru czcionki nagłówka
-          
-        self.task_list = ttk.Treeview(self)
-        self.task_list['columns'] = ('id','title', 'description', 'deadline', 'status', 'priority','tag')
-        
+        style.configure("Treeview", font=('Helvetica', 10), foreground="black", background="lightblue", fieldbackground="lightblue")
+        style.configure("Treeview.Heading", background="blue", foreground="black")
+
+    def configure_treeview_columns(self):
         self.task_list.column('#0', width=0, stretch=False)
         self.task_list.column('id', width=0, stretch=False)
-        self.task_list.column('title', width=100,)
-        self.task_list.column('description', width=200,)
-        self.task_list.column('deadline',width=80,)
-        self.task_list.column('status', width=100,)
-        self.task_list.column('priority',width=100,)
-        self.task_list.column('tag',width=80,)
-     
-    
+        self.task_list.column('title', width=100)
+        self.task_list.column('description', width=200)
+        self.task_list.column('deadline', width=80)
+        self.task_list.column('status', width=100)
+        self.task_list.column('priority', width=100)
+        self.task_list.column('tag', width=80)
+
+    def configure_treeview_headings(self):
         self.task_list.heading('title', text='Zadanie')
         self.task_list.heading('description', text='Opis')
         self.task_list.heading('deadline', text='Termin')
         self.task_list.heading('status', text='Status')
         self.task_list.heading('priority', text='Priorytet')
         self.task_list.heading('tag', text='Tag')
-    
-        self.task_list.pack(side='left',expand='true',fill='both')
-                           
-    def add_to_treeview(self):
-        #czyszczenie treeview
+
+    def populate_treeview(self):
         for i in self.task_list.get_children():
             self.task_list.delete(i)
         data = self.task_manager_main.import_tasks()
-        
         for row in data:
-            self.task_list.insert('','end', values=list(row.values()), iid=row['id'])
-    
+            self.task_list.insert('', 'end', values=list(row.values()), iid=row['id'])
+
+    def bind_events(self):
+        self.task_list.bind("<Double-1>", self.open_editor)
+
     def delete_selected_task(self):
         selected_task_id = self.task_list.selection()[0]
         self.task_list.delete(selected_task_id)
-              
+
     def open_editor(self, event):
-        self.selected_item_id = self.task_list.selection()[0]
-        if self.selected_item_id:
-            item = self.selected_item_id
-            values = self.task_list.item(item, "values")
+        selected_item_id = self.task_list.selection()[0]
+        if selected_item_id:
+            values = self.task_list.item(selected_item_id, "values")
             keys = self.task_list["columns"]
             selected_dictionary = dict(zip(keys, values))
-            EditTaskWindow(self,
-                           self,
-                           self.task_manager_main.task_manager_tiles,
-                           selected_dictionary,
-                           self.selected_item_id)
-            
-    def edit_choosen_task(self, item_id, **values):
+            EditTaskWindow(self, self, self.task_manager_main.task_manager_tiles, selected_dictionary, selected_item_id)
+
+    def edit_chosen_task(self, item_id, **values):
         values_list = list(values.values())
         self.task_list.item(item_id, values=values_list)
-    
+
     def on_select(self):
-        task_id = self.task_list.selection()[0]
-        return task_id 
+        return self.task_list.selection()[0]
+
     
 class TaskManagerTiles(ctk.CTkFrame):
     def __init__(self, parent, col, row, task_manager_main):
@@ -271,6 +265,7 @@ class TaskManagerTiles(ctk.CTkFrame):
         tile = self.tiles.get(str(id_task))
         tile.destroy()
         
+        
         tile = TilesCreator(parent,self,title, priority, due_to, color, id_task)
         self.tiles[str(id_task)] = tile
     
@@ -291,11 +286,12 @@ class TaskManagerTiles(ctk.CTkFrame):
                        self,
                        selected_task,
                        id_task)
+              
         
 class TilesCreator(ctk.CTkFrame):
     def __init__(self, parent, task_manager_tiles, title_name, priority_name, due_to, color, id_task):
         super().__init__(parent, fg_color=TILES)
-        self.pack(side='top', fill='x', pady=5)
+        self.pack(side='bottom', fill='x', pady=5)
         
         self.update_idletasks()
         
@@ -331,32 +327,36 @@ class TilesCreator(ctk.CTkFrame):
         self.bind("<Enter>", self.on_enter)
         self.bind("<Leave>", self.on_leave)
         self.bind("<Double-1>", self.on_double_click)
+        self.bind("<Button-3>", self.right_click)
         
         self.title_label.bind("<Enter>", self.on_enter)
         self.title_label.bind("<Leave>", self.on_leave)
         self.title_label.bind("<Double-1>", self.on_double_click)
+        self.title_label.bind("<Button-3>", self.right_click)
         
         self.priority_label.bind("<Enter>", self.on_enter)
         self.priority_label.bind("<Leave>", self.on_leave)
-        self.priority_label.bind("<Button-1>", self.on_click_priority)
+        self.priority_label.bind("<Double-1>", self.on_double_click)
+        self.priority_label.bind("<Button-3>", self.right_click)
         
         self.due_label.bind("<Enter>", self.on_enter)
         self.due_label.bind("<Leave>", self.on_leave)
-        self.due_label.bind("<Double-1>", self.on_double_click)
+        
+        self.due_label.bind("<Button-3>", self.right_click)
         
     def on_enter(self, event):
         self.configure(fg_color=TILES_HOVER)
     
     def on_leave(self, event):
         self.configure(fg_color=TILES)
-        
-    def on_click_priority(self, event):
-       AddTaskParameters(parent = self, data_name='priority', new_task_window_instance=self)
        
     def on_double_click(self, event):
         self.task_manager_tiles.open_editor(self.id_task_tile)
     
-#klasa tworząca pasek z przyciskami
+    def right_click(self, event):
+        pass
+        
+        
 class TaskManagerButtonBar(ctk.CTkFrame):
     def __init__(self, parent, col, row, task_manager_table, task_manager_main, task_manager_tiles):
         super().__init__(parent, fg_color="transparent")
@@ -388,6 +388,7 @@ class TaskManagerButtonBar(ctk.CTkFrame):
         
         #status selection
         self.selection_button = self.create_button(text='Status', row=0, column=9, command=self.status_selection_button_click, image=None)
+        self.selection_button.grid_remove()
         # change view 
         self.change_view_button =self.create_button(text ='', row=0, column=10, command=self.change_view_button_click, image=refresh_image)
            
@@ -432,6 +433,10 @@ class TaskManagerButtonBar(ctk.CTkFrame):
     
     def change_view_button_click(self):
         self.task_manager_main.change_view()
+        if self.task_manager_main.view_state == 'table':
+            self.selection_button.grid_remove()
+        elif self.task_manager_main.view_state == 'tiles':
+            self.selection_button.grid(row = 0, column=9, sticky ='nsew',padx =2)
     
     def status_selection_button_click(self):
         

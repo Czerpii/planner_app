@@ -175,7 +175,7 @@ class NewTaskWindow(ctk.CTkToplevel):
         save_task_command = Save(task, **params)
         self.invoker.set_command(save_task_command)
         self.invoker.press_button()
-        self.task_manager_table_instance.add_to_treeview()
+        self.task_manager_table_instance.populate_treeview()
         self.task_manager_tiles_instance.new_task_tile(title=params['title'],
                                                        status=params['status'],
                                                         priority=params['priority'],
@@ -235,7 +235,6 @@ class AddTaskParameters(ctk.CTkToplevel):
         self.data_name = data_name
         self.data_file = f"./task_file/{data_name}.csv"
         self.data_list = []
-
         if data_name == 'status':
             self.widget = self.parent.status_list
         elif data_name == 'priority':
@@ -286,8 +285,7 @@ class AddTaskParameters(ctk.CTkToplevel):
             file.close()
 
     def create_buttons_list(self):
-
-        if self.data_name == 'status' or "priority":
+        if self.data_name == 'status' or self.data_name == 'priority' :
             for i in range(len(self.data_list)):
                 record_frame = ctk.CTkFrame(self)
 
@@ -298,7 +296,8 @@ class AddTaskParameters(ctk.CTkToplevel):
                                                            0]: self.button_parameters_clicked(button_text)
                                                        ).pack(side='left')
                 record_frame.pack(pady=2.5)
-        else:
+                
+        elif self.data_name == 'tag':
             self.entry_box = ctk.CTkEntry(self, state='normal', placeholder_text="Wpisz nowy")
             self.entry_box.pack(fill='x', pady=2.5)
             self.entry_box.bind('<Return>', lambda event: self.add_new())
@@ -322,8 +321,8 @@ class AddTaskParameters(ctk.CTkToplevel):
     def button_parameters_clicked(self, button_text):
         self.widget.configure(text=button_text)
         self.destroy()
-        
-        
+       
+       
 
     def button_delete_clicked(self, parameters, index):
         parameters.destroy()

@@ -178,7 +178,7 @@ class EditTaskWindow(ctk.CTkToplevel):
         edit_task_command = Edit(task, **params)
         self.invoker.set_command(edit_task_command)
         self.invoker.press_button()
-        self.task_manager_table.edit_choosen_task(self.selected_item_id, **params)
+        self.task_manager_table.edit_chosen_task(self.selected_item_id, **params)
         self.task_manager_tiles.edit_tile(self.selected_item_id, params['title'], params['priority'], params['deadline'], params['status'])
         
         self.destroy()
