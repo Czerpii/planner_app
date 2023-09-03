@@ -9,7 +9,9 @@ from location.ILocationProvider import *
 
 class IpapiLocation(ILocationProvider):
     def __init__(self):
-        self.location_file = "location.csv"
+        
+        current_path = os.path.dirname(os.path.realpath(__file__))
+        self.location_file = os.path.join(current_path, "location.csv")
         self.headers = ["city", "state"]
 
         if not os.path.exists(self.location_file):

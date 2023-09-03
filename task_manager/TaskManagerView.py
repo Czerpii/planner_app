@@ -3,10 +3,10 @@ import customtkinter as ctk
 from tkinter import ttk
 from PIL import Image
 import csv
-from AddNewTask import NewTaskWindow
+from task_manager.AddNewTask import NewTaskWindow
 from ICommand import Delete
 from invoker import Invoker
-from EditCurrentTask import *
+from task_manager.EditCurrentTask import *
     
 ###colors### 
 #tiles
@@ -360,6 +360,7 @@ class TilesCreator(ctk.CTkFrame):
     def on_double_click(self, event):
         self.task_manager_tiles.open_editor(self.id_task_tile)
         self.configure(fg_color=TILES)
+        self.task_manager_tiles.selected_tile_id=None
     
     def right_click(self, event):
         pass
@@ -446,6 +447,7 @@ class TaskManagerButtonBar(ctk.CTkFrame):
                 return
         
         self.task_manager_tiles.open_editor(id_task)
+        self.task_manager_tiles.selected_tile_id=None
     
     def delete_task_button_click(self):
         

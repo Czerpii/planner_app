@@ -5,10 +5,10 @@ import random
 
 import customtkinter as ctk
 
-from CalendarWidget import CalendarDateEntry
+from task_manager.CalendarWidget import CalendarDateEntry
 from ICommand import Save
 from invoker import Invoker
-from task_manager_reciver import *
+from task_manager.task_manager_reciver import *
 
 # TOPLEVEL
 TOP_LEVEL_FG = "#1E1E1E"
