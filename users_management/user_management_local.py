@@ -1,7 +1,7 @@
 import json
 import hashlib
 import os
-
+from PathSingleton import *
 
 
 
@@ -9,10 +9,10 @@ class Users:
     def __init__(self, parent):
         
        self.view_instance = parent
-        
+       self.pathname = os.path.join(os.path.dirname(os.path.realpath(__file__)), "users.json")
+       
     def save_user(self, users):
-        
-        with open("users.json", "w") as f:
+        with open(self.pathname, "w") as f:
             json.dump(users, f, indent=4)
     
     def find_remembered_user(self):
@@ -48,7 +48,7 @@ class Users:
         
     def load_users(self):
         try:
-            with open("users.json", "r") as f:
+            with open(self.pathname, "r") as f:
                 return json.load(f)
         except FileNotFoundError:
             return {}
@@ -70,9 +70,11 @@ class Users:
             self.view_instance.info_message.configure(text="Błędne hasło")
             return False
 
-        user_folder = self.create_user_folder(username)
+        singleton = PathSingleton()
+        singleton.set_folder_path(username)
 
-        return True, user_folder
+
+        return True
     
     def registration(self, username, email, password, password_repeat):
         
@@ -102,9 +104,11 @@ class Users:
         
         users[username] = {"email": email, "password": hashed_password}
         self.save_user(users)
-        user_folder = self.create_user_folder(username)
+        
+        singleton = PathSingleton()
+        singleton.set_folder_path(username)
 
-        return True, user_folder
+        return True
     
     def hash_password(self, password):
         return hashlib.sha256(password.encode()).hexdigest()
@@ -112,12 +116,12 @@ class Users:
     def verify_password(self, stored_password, provided_password):
         return stored_password == self.hash_password(provided_password)
     
-    def create_user_folder(self, username):
+    # def create_user_folder(self, username):
     
-        current_path = os.path.dirname(os.path.realpath(__file__))
-        folder_path = os.path.join(current_path, "users_data", username)
+    #     current_path = os.path.dirname(os.path.realpath(__file__))
+    #     folder_path = os.path.join(os.path.dirname(current_path), "users_data", username)
         
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
+    #     if not os.path.exists(folder_path):
+    #         os.makedirs(folder_path)
             
-        return folder_path  
+    #     return folder_path  

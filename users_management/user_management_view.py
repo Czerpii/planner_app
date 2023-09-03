@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from user_management_local import Users
+from users_management.user_management_local import Users
 
 
 
@@ -166,5 +166,5 @@ class RegistrationView(ctk.CTkFrame):
                                            self.email_entry.get(),
                                            self.userpassword_entry.get(),
                                            self.userpassword_repeat_entry.get())
-        if registration_status[0]:
+        if registration_status:
             self.parent.main_view(self)

@@ -3,7 +3,7 @@ from settings import *
 from info_bar import *
 from buttons_bar import *
 from TaskManagerView import TaskManagerMain
-from user_management_view import *
+from users_management.user_management_view import *
 
 try:
     from ctypes import windll, byref, sizeof, c_int

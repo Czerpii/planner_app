@@ -1,63 +1,62 @@
-import tkinter as tk
-import customtkinter as ctk
-import color_themes
+import customtkinter
+from PIL import Image
+import os
 
-def change_theme(theme):
-    colors = getattr(color_themes, theme)
-    root.config(bg=colors["background_color"])
-    label.config(fg=colors["text_color"], bg=colors["background_color"])
-    button.config(fg=colors["text_color"], bg=colors["button_color"], activebackground=colors["highlight_color"])
-    entry.config(fg=colors["text_color"], bg=colors["background_color"], insertbackground=colors["text_color"])
-    text_box.config(fg=colors["text_color"], bg=colors["background_color"])
+customtkinter.set_appearance_mode("dark")
 
 
+class App(customtkinter.CTk):
+    width = 900
+    height = 600
 
-root = tk.Tk()
-root.title("Color Theme Tester")
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-label = tk.Label(root, text="Welcome to the Color Theme Tester!")
-label.pack(pady=10)
+        self.title("CustomTkinter example_background_image.py")
+        self.geometry(f"{self.width}x{self.height}")
+        self.resizable(False, False)
 
-button = tk.Button(root, text="Click me!")
-button.pack(pady=10)
-
-entry = tk.Entry(root)
-entry.pack(pady=10)
-
-text_box = tk.Text(root)
-text_box.pack(pady=10)
-
-
-theme_button1 = tk.Button(root, text="Change to Theme 1", command=lambda: change_theme("color_theme_1"))
-theme_button1.pack(pady=10)
-
-theme_button2 = tk.Button(root, text="Change to Theme 2", command=lambda: change_theme("color_theme_2"))
-theme_button2.pack(pady=10)
-
-theme_button3 = tk.Button(root, text="Change to Theme 3", command=lambda: change_theme("color_theme_3"))
-theme_button3.pack(pady=10)
-
-theme_button4 = tk.Button(root, text="Change to Theme 4", command=lambda: change_theme("color_theme_4"))
-theme_button4.pack(pady=10)
-
-theme_button5 = tk.Button(root, text="Change to Theme 5", command=lambda: change_theme("color_theme_5"))
-theme_button5.pack(pady=10)
-
-theme_button6 = tk.Button(root, text="Change to Theme 6", command=lambda: change_theme("color_theme_6"))
-theme_button6.pack(pady=10)
-
-theme_button7 = tk.Button(root, text="Change to Theme 7", command=lambda: change_theme("color_theme_7"))
-theme_button7.pack(pady=10)
-
-theme_button8 = tk.Button(root, text="Change to Theme 8", command=lambda: change_theme("color_theme_8"))
-theme_button8.pack(pady=10)
-
-theme_button9 = tk.Button(root, text="Change to Theme 9", command=lambda: change_theme("color_theme_9"))
-theme_button9.pack(pady=10)
-
-theme_button10 = tk.Button(root, text="Change to Theme 10", command=lambda: change_theme("color_theme_10"))
-theme_button10.pack(pady=10)
+        # load and create background image
+        current_path = os.path.dirname(os.path.realpath(__file__))
+        self.bg_image = customtkinter.CTkImage(Image.open(current_path + "./background.jpg"),
+                                               size=(self.width, self.height))
+        self.bg_image_label = customtkinter.CTkLabel(self, image=self.bg_image)
+        self.bg_image_label.grid(row=0, column=0)
 
 
-root.mainloop()
+        # create login frame
+        self.login_frame = customtkinter.CTkFrame(self, corner_radius=0)
+        self.login_frame.grid(row=0, column=0, sticky="ns")
+        self.login_label = customtkinter.CTkLabel(self.login_frame, text="CustomTkinter\nLogin Page",
+                                                  font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.login_label.grid(row=0, column=0, padx=30, pady=(150, 15))
+        self.username_entry = customtkinter.CTkEntry(self.login_frame, width=200, placeholder_text="username")
+        self.username_entry.grid(row=1, column=0, padx=30, pady=(15, 15))
+        self.password_entry = customtkinter.CTkEntry(self.login_frame, width=200, show="*", placeholder_text="password")
+        self.password_entry.grid(row=2, column=0, padx=30, pady=(0, 15))
+        self.login_button = customtkinter.CTkButton(self.login_frame, text="Login", command=self.login_event, width=200)
+        self.login_button.grid(row=3, column=0, padx=30, pady=(15, 15))
 
+        # create main frame
+        self.main_frame = customtkinter.CTkFrame(self, corner_radius=0)
+        self.main_frame.grid_columnconfigure(0, weight=1)
+        self.main_label = customtkinter.CTkLabel(self.main_frame, text="CustomTkinter\nMain Page",
+                                                 font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.main_label.grid(row=0, column=0, padx=30, pady=(30, 15))
+        self.back_button = customtkinter.CTkButton(self.main_frame, text="Back", command=self.back_event, width=200)
+        self.back_button.grid(row=1, column=0, padx=30, pady=(15, 15))
+
+    def login_event(self):
+        print("Login pressed - username:", self.username_entry.get(), "password:", self.password_entry.get())
+
+        self.login_frame.grid_forget()  # remove login frame
+        self.main_frame.grid(row=0, column=0, sticky="nsew", padx=100)  # show main frame
+
+    def back_event(self):
+        self.main_frame.grid_forget()  # remove main frame
+        self.login_frame.grid(row=0, column=0, sticky="ns")  # show login frame
+
+
+if __name__ == "__main__":
+    app = App()
+    app.mainloop()

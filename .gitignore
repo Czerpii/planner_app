@@ -4,3 +4,9 @@ location/__pycache__/
 location.csv
 .DS_Store
 tasks.csv
+priority.csv
+status.csv
+tag.csv
+test.py
+test2.py
+users.json

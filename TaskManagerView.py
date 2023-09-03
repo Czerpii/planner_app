@@ -24,6 +24,10 @@ class TaskManagerMain(ctk.CTkFrame):
         super().__init__(parent, fg_color="transparent")
         self.grid(column = col, row=row, sticky = "nsew")
 
+        singleton = PathSingleton()
+        self.pathname = singleton.folder_path
+        self.tasks_file = os.path.join(self.pathname, "tasks.csv")
+        
         self.initialize_variables()
         self.configure_layout()
         self.initialize_widgets()
@@ -41,6 +45,7 @@ class TaskManagerMain(ctk.CTkFrame):
         self.rowconfigure(1, weight=20, uniform="a")
 
     def initialize_widgets(self):
+        TaskManager()
         self.task_manager_table = TaskManagerTable(self, 0, 1, self)
         self.task_manager_tiles = TaskManagerTiles(self, 0, 1, self)
         self.task_manager_tiles.grid_remove()
@@ -57,13 +62,12 @@ class TaskManagerMain(ctk.CTkFrame):
             self.view_state = "table"
         
     def import_tasks(self):
-        task_file = './task_file/tasks.csv'
+        
         data = []
-        if os.path.exists(task_file):
-            with open(task_file, 'r', encoding='utf-8') as file:
+        if os.path.exists(self.tasks_file):
+            with open(self.tasks_file, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file)
                 data = list(reader)
-            file.close()
         return data   
     
     def import_all_status(self):
@@ -72,8 +76,7 @@ class TaskManagerMain(ctk.CTkFrame):
             reader = csv.reader(file)
             next(reader)
             for row in reader:
-                status.append(row)
-            file.close() 
+                status.append(row) 
         return status
  
 
@@ -88,7 +91,6 @@ class TaskManagerTable(ctk.CTkFrame):
         self.bind_events()
 
     def initialize_variables(self, main_task_manager_instance):
-        self.task_file = './task_file/tasks.csv'
         self.invoker = Invoker()
         self.task_manager_main = main_task_manager_instance
 

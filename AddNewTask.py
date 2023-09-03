@@ -54,11 +54,6 @@ class NewTaskWindow(ctk.CTkToplevel):
         self.task_manager_tiles_instance = task_manager_tiles_instance
         self.add_task = AddTaskParameters
 
-        # create storage file to tag priority status
-        self.create_data_storage_file("priority")
-        self.create_data_storage_file("status")
-        self.create_data_storage_file("tag")
-
         # layout
         self.columnconfigure(0, weight=1, uniform="a")
         self.columnconfigure(1, weight=2, uniform='a')
@@ -201,40 +196,18 @@ class NewTaskWindow(ctk.CTkToplevel):
 
         self.cal_widget.destroy()
 
-    def create_data_storage_file(self, data_name: str):
-        """Tworzy pliki przechowujące parametry: status, prioryter, tag
-
-        Args:
-            data_name (str): należy podać jeden z parametrów dla które chcemy utworzyć plik
-        """
-        file_name = f"./task_file/{data_name}.csv"
-        self.headers = [data_name]
-
-        if data_name == "tag":
-            elements = [["Praca"], ["Nauka"], ["Rozwój"]]
-        elif data_name == "priority":
-            elements = [["Niski"], ["Średni"], ["Wysoki"]]
-        elif data_name == "status":
-            elements = [["Nie rozpoczęto"], ["W trakcie"], ["Zakończony"]]
-
-        if not os.path.exists(file_name):
-            with open(file_name, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(self.headers)
-                file.close()
-
-            with open(file_name, 'a', encoding='utf-8', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerows(elements)
-
 
 class AddTaskParameters(ctk.CTkToplevel):
     def __init__(self, parent, data_name, new_task_window_instance):
         super().__init__(parent)
         self.parent = new_task_window_instance
         self.data_name = data_name
-        self.data_file = f"./task_file/{data_name}.csv"
+        
+        singleton = PathSingleton()
+        self.pathname = singleton.folder_path
+        self.data_file = os.path.join(self.pathname, f"{data_name}.csv")
         self.data_list = []
+        
         if data_name == 'status':
             self.widget = self.parent.status_list
         elif data_name == 'priority':
