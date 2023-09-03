@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from PIL import Image
-from TaskManager import TaskManagerMain
+from TaskManagerView import TaskManagerMain
 
 
 class ButtonsBar(ctk.CTkFrame):
