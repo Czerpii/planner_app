@@ -3,10 +3,11 @@ import customtkinter as ctk
 from tkinter import ttk
 from PIL import Image
 import csv
-from AddNewTask import *
+from AddNewTask import NewTaskWindow
 from ICommand import Delete
 from invoker import Invoker
-from EditCurrentTask import *      
+from EditCurrentTask import *
+    
 ###colors### 
 #tiles
 FRAME_TILES = "#1b2127"
