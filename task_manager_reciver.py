@@ -38,7 +38,7 @@ class TaskManager():
                 
             with open(self.status_file, 'a', encoding='utf-8', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerows([["Nie rozpoczęto"], ["W trakcie"], ["Zakończony"]])
+                writer.writerows([["Nie rozpoczęto"], ["W trakcie"], ["Zakończony"], ["Zarchiwizowane"]])
         
         #create tag file       
         if not os.path.exists(self.tag_file):
