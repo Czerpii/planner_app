@@ -2,7 +2,8 @@ import customtkinter as ctk
 from settings import *
 from info_bar import *
 from buttons_bar import *
-from TaskManager import TaskManagerMain
+from TaskManagerView import TaskManagerMain
+from user_management_view import *
 
 try:
     from ctypes import windll, byref, sizeof, c_int
@@ -14,7 +15,7 @@ class Main(ctk.CTk):
     def __init__(self):
         super().__init__(fg_color=BLACK)
         self.setup_window()
-        self.create_ui_elements()
+        self.user_management_view()
         self.mainloop()
 
 
@@ -47,20 +48,30 @@ class Main(ctk.CTk):
         center_y = int(screen_height / 2 - height / 2)
         self.geometry(f'{width}x{height}+{center_x}+{center_y}')
         self.minsize(width, height)
+        self.maxsize(width, height)
 
+    def user_management_view(self):
+        self.configure(fg_color="#0b2e6b")
+        LoginView(self)
+    
     def create_ui_elements(self):
-        self.configure_grid()
+        self.configure_grid_main_view()
         InfoBar(self, col=1, row=0, rowspan=2)
         ButtonsBar(self, 0, 0)
         TaskManagerMain(self, 0, 1)
-
-    def configure_grid(self):
+    
+    def configure_grid_main_view(self):
         self.columnconfigure(0, weight=5, uniform='a')
         self.columnconfigure(1, weight=1, uniform='a')
         self.rowconfigure(0, weight=1, uniform='a')
         self.rowconfigure(1, weight=15, uniform='a')
+        self.configure(fg_color=BLACK)
+        
+    def main_view(self, instance):
+        instance.pack_forget()
+        self.create_ui_elements()
 
-
+    
 if __name__ == '__main__':
     ctk.set_appearance_mode("dark")
     Main()
