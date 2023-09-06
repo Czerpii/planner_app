@@ -79,7 +79,6 @@ class TaskManagerMain(ctk.CTkFrame):
             for row in reader:
                 status.append(row) 
         return status
- 
 
 class TaskManagerTable(ctk.CTkFrame):
     def __init__(self, parent, col, row, main_task_manager_instance):
@@ -155,8 +154,7 @@ class TaskManagerTable(ctk.CTkFrame):
 
     def on_select(self):
         return self.task_list.selection()[0]
-
-    
+ 
 class TaskManagerTiles(ctk.CTkFrame):
     
     def __init__(self, parent, col, row, task_manager_main):
@@ -375,8 +373,6 @@ class TilesCreator(ctk.CTkFrame):
         self.configure(fg_color=TILES_HOVER)  # Zmiana koloru na kolor zaznaczenia
         self.task_manager_tiles.selected_tile_id = self.id_task_tile  # Zapamiętanie ID zaznaczonego kafelka
 
-
-        
 class TaskManagerButtonBar(ctk.CTkFrame):
     def __init__(self, parent, col, row, task_manager_table, task_manager_main, task_manager_tiles):
         super().__init__(parent, fg_color="transparent")
