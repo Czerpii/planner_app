@@ -2,7 +2,7 @@ import customtkinter as ctk
 from settings import *
 from info_bar import *
 from buttons_bar import *
-from task_manager.TaskManagerView import TaskManagerMain
+from task_manager.task_manager_view import TaskManagerMain
 from users_management.user_management_view import *
 
 try:
