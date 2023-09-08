@@ -1,45 +1,81 @@
+
 import customtkinter as ctk
 from PIL import Image
 from task_manager.task_manager_view import TaskManagerMain
 from notes_manager.note_manager_view import NoteManagerMain
 
 class ButtonsBar(ctk.CTkFrame):
+    """
+    Class representing the ButtonsBar frame. This frame provides buttons for switching
+    between different views
+    """
+    
     def __init__(self, parent, col, row):
-        super().__init__(parent, fg_color='#474747', )
+        """Initialize the ButtonsBar frame.
+
+        :param parent: Parent widget.
+        :param col: Column position for grid placement.
+        :param row: Row position for grid placement.
+        """
+        super().__init__(parent, fg_color='#474747')
         self.grid(column=col, row=row, sticky='nsew')
         self.parent = parent
+        self.current_view = None
 
+        # View initializations
+        self.task_manager_view = TaskManagerMain(self.parent, 0, 1)
+        self.note_manager_view = NoteManagerMain(self.parent, 0, 1)
+
+        # UI setup
+        self.setup_ui_elements()
+
+    def setup_ui_elements(self):
+        """Setup UI elements for the ButtonsBar."""
+        # Configuring grid for layout
         self.rowconfigure(0, weight=1, uniform='a')
         self.columnconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1, uniform='a')
 
-        # dodawanie obrazków
-        task_image = ctk.CTkImage(dark_image=Image.open("./button_image/tasks.png"),
-                                  light_image=Image.open("./button_image/tasks.png"),
-                                  size=(40, 40))
+        # Image setup for buttons
+        task_image = self.load_image("./button_image/tasks.png", (40, 40))
+        note_image = self.load_image("./button_image/note.png", (50, 50))
 
-        note_image = ctk.CTkImage(dark_image=Image.open("./button_image/note.png"),
-                                       light_image=Image.open("./button_image/note.png"),
-                                       size=(50, 50))
-
-        # przycisk uruchamijacy widok menadżera zadań
-        self.task_manager_button = ctk.CTkButton(self,
-                                                 text="",
-                                                 fg_color='transparent',
-                                                 hover_color="#5F5F5F",
-                                                 image=task_image,
-                                                 command=self.task_manager_button_click)
+        # TaskManager Button
+        self.task_manager_button = self.create_button(task_image, self.task_manager_button_click)
         self.task_manager_button.grid(column=0, row=0, sticky='ns', padx=5, pady=1)
 
-        self.note_button = ctk.CTkButton(self,
-                                             text="",
-                                             fg_color='transparent',
-                                             hover_color="#5F5F5F",
-                                             image=note_image,
-                                             command=self.note_manager_button_click)
+        # NoteManager Button
+        self.note_button = self.create_button(note_image, self.note_manager_button_click)
         self.note_button.grid(column=1, row=0, sticky='ns', pady=1)
 
+    def load_image(self, path, size):
+        """Load an image from a given path and resize it to the specified size.
+
+        :param path: Path to the image file.
+        :param size: Tuple containing width and height for resizing.
+        :return: Resized image.
+        """
+        return ctk.CTkImage(dark_image=Image.open(path), light_image=Image.open(path), size=size)
+
+    def create_button(self, image, command):
+        """Create a button with the specified image and command.
+
+        :param image: Image to display on the button.
+        :param command: Command to execute when the button is clicked.
+        :return: Created button.
+        """
+        return ctk.CTkButton(self, text="", fg_color='transparent', hover_color="#5F5F5F", image=image, command=command)
+
+    def switch_view(self, new_view):
+        """Switch to the given view, hiding the current one."""
+        if self.current_view:
+            self.current_view.grid_forget()
+        self.current_view = new_view
+        self.current_view.grid(column=0, row=1, sticky='nsew')
+
     def task_manager_button_click(self):
-        TaskManagerMain(self.parent, 0, 1)
+        """Switch to the TaskManager view."""
+        self.switch_view(self.task_manager_view)
 
     def note_manager_button_click(self):
-        NoteManagerMain(self.parent, 0, 1)
+        """Switch to the NoteManager view."""
+        self.switch_view(self.note_manager_view)
