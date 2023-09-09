@@ -1,6 +1,6 @@
 from customtkinter import CTkFrame
 from weather.WeatherWidget import *
-
+from world_clock.clock_view import WorldClock
 
 class InfoBar(CTkFrame):
     def __init__(self, parent, col, row, rowspan):
@@ -10,7 +10,9 @@ class InfoBar(CTkFrame):
         # layout
         self.columnconfigure(0, weight=1, uniform='a')
         self.rowconfigure(0, weight=1, uniform='a')
-        self.rowconfigure(1, weight=2, uniform='a')
+        self.rowconfigure(1, weight=1, uniform='a')
+        self.rowconfigure(2, weight=1, uniform='a')
 
         # widget
-        WeatherWidget(self, col=0, row=0)
+        WeatherWidget(self, col=0, row=2)
+        WorldClock(self, col=0, row=0)

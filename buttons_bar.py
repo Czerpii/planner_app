@@ -25,6 +25,7 @@ class ButtonsBar(ctk.CTkFrame):
         # View initializations
         self.task_manager_view = TaskManagerMain(self.parent, 0, 1)
         self.note_manager_view = NoteManagerMain(self.parent, 0, 1)
+        self.note_manager_view.grid_forget()
 
         # UI setup
         self.setup_ui_elements()
