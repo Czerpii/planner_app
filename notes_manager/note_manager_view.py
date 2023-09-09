@@ -1,75 +1,9 @@
-#testowo
-########################################
-HEIGHT = 720
-WIDTH = 1080
-#COLORS
-BLACK = '#000000'
-#FONT BUTTON
-FAMILY = 'CALIBRI'
-#title bar color 0x00(hex color: (BBGGRR)) B-blue, G-green, R-red
-TITLE_BAR_COLOR_GREEN = 0x00ABBF50 
-TITLE_BAR_COLOR_BLACK = 0x00000000
-try:
-    from ctypes import windll, byref, sizeof, c_int
-except ImportError:
-    pass
-
-##############################################
 
 import customtkinter as ctk
 from PIL import Image
 import os
+from notes_manager.note_manager_reciver import *
 
-
-class Main(ctk.CTk):
-    def __init__(self):
-        super().__init__()
-        self.setup_window()
-        
-        self.configure_grid_main_view()
-        self.note =NoteManagerMain(self, 0,1)
-        self.mainloop()
-
-
-    def setup_window(self):
-        self.change_title_bar_color()
-        self.set_geometry_and_center(WIDTH, HEIGHT)
-        self.title('')
-        self.set_icon('./empty.ico')
-        
-
-    def set_icon(self, icon_path):
-        try:
-            self.iconbitmap(icon_path)
-        except:
-            print("Błędna ścieżka")
-            pass
-    
-    def configure_grid_main_view(self):
-        self.columnconfigure(0, weight=5, uniform='a')
-        self.columnconfigure(1, weight=1, uniform='a')
-        self.rowconfigure(0, weight=1, uniform='a')
-        self.rowconfigure(1, weight=15, uniform='a')
-        self.configure(fg_color=BLACK)
-        
-    def change_title_bar_color(self):
-        try:
-            HWND = windll.user32.GetParent(self.winfo_id())
-            DWMWA_ATTRIBUTE = 35
-            COLOR = TITLE_BAR_COLOR_BLACK
-            windll.dwmapi.DwmSetWindowAttribute(HWND, DWMWA_ATTRIBUTE, byref(c_int(COLOR)), sizeof(c_int))
-        except:
-            pass
-
-    def set_geometry_and_center(self, width, height):
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        center_x = int(screen_width / 2 - width / 2)
-        center_y = int(screen_height / 2 - height / 2)
-        self.geometry(f'{width}x{height}+{center_x}+{center_y}')
-        self.minsize(width, height)
-        self.maxsize(width, height)
-    
 
 NOTE_BG = "#212529"
 NOTE_BORDER = "#343A40"
@@ -85,10 +19,11 @@ class NoteManagerMain(ctk.CTkFrame):
         
         self.color_palette = self.import_ico_images("color_palette.png")
         
-        
         self.note_bar = NoteManagerNoteBar(self, 0,0)
         self.note_tiles = NoteManagerNotesTiles(self,0,1)
+        self.note_manager = NoteManager()
         
+    
         self.bind("<Button-1>", self.note_bar.off_focus)
     
     def configure_layout(self):
@@ -267,7 +202,58 @@ class NoteManagerNoteBar(ctk.CTkFrame):
         self.entry_description.delete(0.0, 'end')
         self.expanded_frame.pack_forget()
         self.default_frame.pack(pady=15)
+
+class NoteManagerNotesTiles(ctk.CTkScrollableFrame):
+    def __init__(self, parent, col, row ):
+        super().__init__(parent, fg_color="transparent")
+        self.grid(column=col, row=row, sticky='nsew')
+        
+        self.main_instance = parent
+        
+        self.configure_grid()
+        self.create_columns()
+        self.test()
+        # self.create_tiles()
+                      
+    def configure_grid(self):
+        self.rowconfigure(0, weight=1, uniform='a')
+        self.columnconfigure((0,1,2,3), weight=1, uniform='a')
+        
+    def create_columns(self):
+        
+        self.col_1 = ctk.CTkFrame(self, fg_color='transparent')
+        self.col_1.grid(column=0, row=0, sticky='nsew')
+        
+        self.col_2 = ctk.CTkFrame(self, fg_color='transparent')
+        self.col_2.grid(column=1, row=0, sticky='nsew')
+        
+        self.col_3 = ctk.CTkFrame(self, fg_color='transparent')
+        self.col_3.grid(column=2, row=0, sticky='nsew')
+        
+        self.col_4 = ctk.CTkFrame(self, fg_color='transparent')
+        self.col_4.grid(column=3, row=0, sticky='nsew')
+        
+        self.columns = {1: self.col_1, 2: self.col_2, 3: self.col_3, 4: self.col_4}
     
+    def test(self):
+        NoteTile(self.col_1, self.main_instance)
+    
+    def create_tiles(self):
+        
+        
+        for key, master in self.columns.items():
+            ctk.CTkLabel(master=master, text="text", fg_color='red', height=100).pack(side='top', expand='true', fill='both', padx=2, pady=2)
+
+        ctk.CTkLabel(master=self.columns[1], text="text", fg_color='blue', height=100).pack(side='top', expand='true', fill='both', padx=2, pady=2)
+        
+        ctk.CTkLabel(master=self.columns[1], text="text", fg_color='blue', height=150).pack(side='top', expand='true', fill='both', padx=2, pady=2)
+        
+        ctk.CTkLabel(master=self.columns[4], text="text", fg_color='blue', height=50).pack(side='top', expand='true', fill='both', padx=2, pady=2)
+        
+        ctk.CTkLabel(master=self.columns[2], text="text", fg_color='yellow', height=400).pack(side='top', expand='true', fill='both', padx=2, pady=2)
+        
+        ctk.CTkLabel(master=self.columns[3], text="text", fg_color='blue', height=200).pack(side='top', expand='true', fill='both', padx=2, pady=2)
+     
 
 class NoteTile(ctk.CTkFrame):
     """NoteTile is a custom frame for displaying a note with title and description."""
@@ -326,29 +312,8 @@ class NoteTile(ctk.CTkFrame):
                                           command=self.change_color)
         self.color_button.pack_propagate(False)
         self.color_button.pack(side='left', padx=2, pady=2)
-        
-        self.cancel_button =ctk.CTkButton(self.button_frame,
-                                          text='',
-                                          width=30,
-                                          fg_color='transparent',
-                                          hover=False,
-                                          image=self.note_main.import_ico_images("cancel.png"),
-                                          command=self.cancel_button_click)
-        self.cancel_button.pack_propagate(False)
-        self.cancel_button.pack(side='right', padx=2, pady=2)
-        
-        self.confirm_button =ctk.CTkButton(self.button_frame,
-                                          text='',
-                                          width=30,
-                                          fg_color='transparent',
-                                          hover=False,
-                                          image=self.note_main.import_ico_images("tick.png"),
-                                          command=None)
-        self.confirm_button.pack_propagate(False)
-        self.confirm_button.pack(side='right', padx=2, pady=2)
-        
-        
-        
+    
+               
     def change_color(self):
         """Open top level window with color palette."""
         self.note_main.top_level_color_management(self, self.color_button, self.set_color)
@@ -364,60 +329,4 @@ class NoteTile(ctk.CTkFrame):
         self.note_bar.default_frame.pack(pady=15)
 
 
-class NoteManagerNotesTiles(ctk.CTkScrollableFrame):
-    def __init__(self, parent, col, row ):
-        super().__init__(parent, fg_color="transparent")
-        self.grid(column=col, row=row, sticky='nsew')
-        
-        self.configure_grid()
-        self.create_columns()
-        self.create_tiles()
-        
-        
-        
-    def configure_grid(self):
-        self.rowconfigure(0, weight=1, uniform='a')
-        self.columnconfigure((0,1,2,3), weight=1, uniform='a')
-        
-        
-    
-    def create_columns(self):
-        
-        self.col_1 = ctk.CTkFrame(self, fg_color='transparent')
-        self.col_1.grid(column=0, row=0, sticky='nsew')
-        
-        self.col_2 = ctk.CTkFrame(self, fg_color='transparent')
-        self.col_2.grid(column=1, row=0, sticky='nsew')
-        
-        self.col_3 = ctk.CTkFrame(self, fg_color='transparent')
-        self.col_3.grid(column=2, row=0, sticky='nsew')
-        
-        self.col_4 = ctk.CTkFrame(self, fg_color='transparent')
-        self.col_4.grid(column=3, row=0, sticky='nsew')
-        
-        self.columns = {1: self.col_1, 2: self.col_2, 3: self.col_3, 4: self.col_4}
-    
-    def create_tiles(self):
-        
-        
-        for key, master in self.columns.items():
-            ctk.CTkLabel(master=master, text="text", fg_color='red', height=100).pack(side='top', expand='true', fill='both', padx=2, pady=2)
 
-        ctk.CTkLabel(master=self.columns[1], text="text", fg_color='blue', height=100).pack(side='top', expand='true', fill='both', padx=2, pady=2)
-        
-        ctk.CTkLabel(master=self.columns[1], text="text", fg_color='blue', height=150).pack(side='top', expand='true', fill='both', padx=2, pady=2)
-        
-        ctk.CTkLabel(master=self.columns[4], text="text", fg_color='blue', height=50).pack(side='top', expand='true', fill='both', padx=2, pady=2)
-        
-        ctk.CTkLabel(master=self.columns[2], text="text", fg_color='yellow', height=400).pack(side='top', expand='true', fill='both', padx=2, pady=2)
-        
-        ctk.CTkLabel(master=self.columns[3], text="text", fg_color='blue', height=200).pack(side='top', expand='true', fill='both', padx=2, pady=2)
-    
-  
-  
-
-
-       
-if __name__ == '__main__':
-    ctk.set_appearance_mode("dark")
-    Main()

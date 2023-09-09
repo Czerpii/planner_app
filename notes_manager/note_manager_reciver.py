@@ -20,7 +20,14 @@ class NoteManager():
                 writer = csv.writer(file)
                 writer.writerow(self.headers)
                 
-                
+    
+    def import_notes(self):
+        data = []
+        with open(self.note_file, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            data = list(reader)
+        return data
+           
     def save_note(self, note_content):
         with open(self.note_file, 'a', encoding='utf-8') as file:
             writer = csv.DictWriter(file, fieldnames=self.headers)
