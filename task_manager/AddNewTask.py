@@ -166,8 +166,8 @@ class NewTaskWindow(ctk.CTkToplevel):
             'priority': self.priority_list.cget("text"),
             'tag': self.tag_list.cget("text")
         }
-        task = TaskManager()
-        save_task_command = Save(task, **params)
+        reciver = TaskManager()
+        save_task_command = Save(reciver, **params)
         self.invoker.set_command(save_task_command)
         self.invoker.press_button()
         self.task_manager_table_instance.populate_treeview()

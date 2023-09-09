@@ -11,6 +11,7 @@ class WeatherWidget(ctk.CTkFrame):
         self.columnconfigure(0, weight=1, uniform='a')
         self.rowconfigure(0, weight=1,uniform='a')
         self.rowconfigure(1, weight=4,uniform='a')
+        self.grid_propagate(False)
       
       
       

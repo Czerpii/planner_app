@@ -26,6 +26,7 @@ class LoginView(ctk.CTkFrame):
         self.create_login_buttons_frame()
         self.create_additional_buttons()
         self.info_label()
+        
            
     def configure_layout(self):
         self.columnconfigure((0,1), weight=1, uniform='b')
@@ -48,6 +49,8 @@ class LoginView(ctk.CTkFrame):
         
         self.userpassword_entry = ctk.CTkEntry(self.userdata_frame, placeholder_text='Hasło', show="*")
         self.userpassword_entry.grid(column=0, row=2, columnspan=2, sticky='nsew', pady=10)
+        
+        self.userpassword_entry.bind("<Return>", self.enter_click)
 
     def create_login_buttons_frame(self):
         
@@ -57,7 +60,7 @@ class LoginView(ctk.CTkFrame):
         self.buttons_frame.columnconfigure((0,1), weight=1, uniform='b')
         self.buttons_frame.rowconfigure(0, weight=1, uniform='b')
         
-        self.login_button = ctk.CTkButton(self.buttons_frame, text="Zaloguj się", command=self.login_button)
+        self.login_button = ctk.CTkButton(self.buttons_frame, text="Zaloguj się", command=self.login_button_click)
         self.login_button.grid(column=1, row=0, sticky='nsew')
         
         self.remember_me_button = ctk.CTkCheckBox(self.buttons_frame,
@@ -80,7 +83,7 @@ class LoginView(ctk.CTkFrame):
         self.info_message = ctk.CTkLabel(self, text="", font=ctk.CTkFont(family="Abril Fatface", size=15), text_color='red')
         self.info_message.grid(column=0, columnspan=2, row=2, sticky='nsew' )
         
-    def login_button(self):
+    def login_button_click(self):
         
         login_status = self.users_management.login(self.username_entry.get(),
                                                     self.userpassword_entry.get())
@@ -97,6 +100,9 @@ class LoginView(ctk.CTkFrame):
         self.destroy()
         RegistrationView(self.parent)
 
+    def enter_click(self, event):
+        self.login_button_click()
+        
 class RegistrationView(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, fg_color='#0c3377', corner_radius=10)

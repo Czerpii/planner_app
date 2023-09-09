@@ -51,6 +51,24 @@ class TaskManager():
                 writer.writerows([["Praca"], ["Nauka"], ["Rozwój"]])
     
     
+    def import_tasks(self):
+        
+        data = []
+        if os.path.exists(self.tasks_file):
+            with open(self.tasks_file, 'r', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                data = list(reader)
+        return data   
+    
+    def import_all_status(self):
+        status = []
+        with open(self.status_file, 'r', encoding='utf-8') as file:
+            reader = csv.reader(file)
+            next(reader)
+            for row in reader:
+                status.append(row) 
+        return status
+    
     def save_task(self, task_information):
         with open(self.tasks_file, 'a', encoding='utf-8') as file:
             writer=csv.DictWriter(file, fieldnames=self.headers)

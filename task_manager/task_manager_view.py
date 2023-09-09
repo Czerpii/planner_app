@@ -46,7 +46,7 @@ class TaskManagerMain(ctk.CTkFrame):
         self.rowconfigure(1, weight=20, uniform="a")
 
     def initialize_widgets(self):
-        TaskManager()
+        self.task_reciver = TaskManager()
         self.task_manager_table = TaskManagerTable(self, 0, 1, self)
         self.task_manager_tiles = TaskManagerTiles(self, 0, 1, self)
         self.task_manager_tiles.grid_remove()
@@ -61,25 +61,7 @@ class TaskManagerMain(ctk.CTkFrame):
             self.task_manager_tiles.grid_remove()  
             self.task_manager_table.grid()  
             self.view_state = "table"
-        
-    def import_tasks(self):
-        
-        data = []
-        if os.path.exists(self.tasks_file):
-            with open(self.tasks_file, 'r', encoding='utf-8') as file:
-                reader = csv.DictReader(file)
-                data = list(reader)
-        return data   
     
-    def import_all_status(self):
-        status = []
-        with open(self.status_file, 'r', encoding='utf-8') as file:
-            reader = csv.reader(file)
-            next(reader)
-            for row in reader:
-                status.append(row) 
-        return status
-
 class TaskManagerTable(ctk.CTkFrame):
     def __init__(self, parent, col, row, main_task_manager_instance):
         super().__init__(parent, fg_color="transparent")
@@ -127,7 +109,7 @@ class TaskManagerTable(ctk.CTkFrame):
     def populate_treeview(self):
         for i in self.task_list.get_children():
             self.task_list.delete(i)
-        data = self.task_manager_main.import_tasks()
+        data = self.task_manager_main.task_reciver.import_tasks()
         for row in data:
             self.task_list.insert('', 'end', values=list(row.values()), iid=row['id'])
 
@@ -173,7 +155,7 @@ class TaskManagerTiles(ctk.CTkFrame):
            
     def create_tiles(self):
        
-        data_dict = self.task_manager_main.import_tasks()
+        data_dict = self.task_manager_main.task_reciver.import_tasks()
         item_amount = len(data_dict)
         status_to_frame = {
             'Nie rozpoczęto': self.status_frame_not_started,
@@ -282,7 +264,7 @@ class TaskManagerTiles(ctk.CTkFrame):
        
     def open_editor(self, id_task):
         selected_task = []
-        for row in self.task_manager_main.import_tasks():
+        for row in self.task_manager_main.task_reciver.import_tasks():
             if row['id'] == str(id_task):
                 selected_task = row     
         
@@ -476,7 +458,7 @@ class TaskManagerButtonBar(ctk.CTkFrame):
     
     def status_selection_button_click(self):
         
-        status = self.task_manager_main.import_all_status()
+        status = self.task_manager_main.task_reciver.import_all_status()
         
         self.status_top = ctk.CTkToplevel(self.task_manager_main)
         x_pos = self.selection_button.winfo_rootx()
