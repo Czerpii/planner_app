@@ -12,7 +12,7 @@ NOTE_HOVER = "#616971"
 
 class NoteManagerMain(ctk.CTkFrame):
     def __init__(self, parent, col, row):
-        super().__init__(parent, fg_color=NOTE_BG)
+        super().__init__(parent, fg_color=NOTE_BG, corner_radius=5)
         self.grid(column=col, row=row, sticky='nsew')
         
         self.configure_layout()
@@ -86,7 +86,7 @@ class NoteManagerMain(ctk.CTkFrame):
                   
 class NoteManagerNoteBar(ctk.CTkFrame):
     def __init__(self, parent, col, row):
-        super().__init__(parent, fg_color="transparent")
+        super().__init__(parent, fg_color="transparent", corner_radius=5)
         self.grid(column= col, row=row, sticky='nsew')
         
         self.note_main = parent

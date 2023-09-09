@@ -16,7 +16,7 @@ class Main(ctk.CTk):
     
     def __init__(self):
         """Initialize the main application window."""
-        super().__init__(fg_color=BLACK)
+        super().__init__(fg_color="#004B23")
         self.setup_window()
         self.user_management_view()
         self.mainloop()
@@ -44,7 +44,7 @@ class Main(ctk.CTk):
         try:
             HWND = windll.user32.GetParent(self.winfo_id())
             DWMWA_ATTRIBUTE = 35
-            COLOR = TITLE_BAR_COLOR_BLACK
+            COLOR = TITLE_BAR_COLOR_GREEN
             windll.dwmapi.DwmSetWindowAttribute(HWND, DWMWA_ATTRIBUTE, byref(c_int(COLOR)), sizeof(c_int))
         except:
             pass
@@ -82,7 +82,7 @@ class Main(ctk.CTk):
         self.columnconfigure(1, weight=1, uniform='a')
         self.rowconfigure(0, weight=1, uniform='a')
         self.rowconfigure(1, weight=15, uniform='a')
-        self.configure(fg_color=BLACK)
+        self.configure(fg_color="#004B23")
 
     def main_view(self, instance):
         """Display the main application view.

@@ -21,7 +21,7 @@ LOW_PRIORITY = '#8d9214'
      
 class TaskManagerMain(ctk.CTkFrame):
     def __init__(self, parent, col, row,):
-        super().__init__(parent, fg_color="transparent")
+        super().__init__(parent, fg_color="transparent", corner_radius=0, border_width=0)
         self.grid(column = col, row=row, sticky = "nsew")
 
         singleton = PathSingleton()
@@ -140,7 +140,7 @@ class TaskManagerTable(ctk.CTkFrame):
 class TaskManagerTiles(ctk.CTkFrame):
     
     def __init__(self, parent, col, row, task_manager_main):
-        super().__init__(parent, fg_color='transparent')
+        super().__init__(parent, fg_color='#004B23')
         self.grid(column = col, row=row, sticky='nsew')
     
         #instances
@@ -357,7 +357,7 @@ class TilesCreator(ctk.CTkFrame):
 
 class TaskManagerButtonBar(ctk.CTkFrame):
     def __init__(self, parent, col, row, task_manager_table, task_manager_main, task_manager_tiles):
-        super().__init__(parent, fg_color="transparent")
+        super().__init__(parent, fg_color="#004B23", corner_radius=0, border_width=0)
         self.grid(column = col, row=row, sticky = "nsew")
         
         #instances
@@ -398,12 +398,15 @@ class TaskManagerButtonBar(ctk.CTkFrame):
         button = ctk.CTkButton(self, 
                       text = text,
                       command=command,
-                      image=image
+                      image=image,
+                      fg_color="#006400",
+                      hover_color="#008000"
                       )
         button.grid(row = row, 
                     column=column, 
                     sticky ='nsew',
-                    padx =2
+                    padx =2,
+                    pady=2
                     )
         return button
     

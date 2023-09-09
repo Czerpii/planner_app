@@ -1,62 +1,41 @@
-import customtkinter
-from PIL import Image
-import os
+import pytz
+from datetime import datetime
+import time
+import requests
 
-customtkinter.set_appearance_mode("dark")
+# api_url = "http://worldtimeapi.org/api/"
 
-
-class App(customtkinter.CTk):
-    width = 900
-    height = 600
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.title("CustomTkinter example_background_image.py")
-        self.geometry(f"{self.width}x{self.height}")
-        self.resizable(False, False)
-
-        # load and create background image
-        current_path = os.path.dirname(os.path.realpath(__file__))
-        self.bg_image = customtkinter.CTkImage(Image.open(current_path + "./background.jpg"),
-                                               size=(self.width, self.height))
-        self.bg_image_label = customtkinter.CTkLabel(self, image=self.bg_image)
-        self.bg_image_label.grid(row=0, column=0)
+# def display_time(timezone_str):
+#     timezone = pytz.timezone(timezone_str)
+    
+#     while True:
+#         now = datetime.now(timezone)
+#         print(now.strftime('%Y-%m-%d %H:%M:%S'))
+#         time.sleep(1)  # Opóźnienie 1 sekunda
+        
+# display_time("America/Mexico_City")
 
 
-        # create login frame
-        self.login_frame = customtkinter.CTkFrame(self, corner_radius=0)
-        self.login_frame.grid(row=0, column=0, sticky="ns")
-        self.login_label = customtkinter.CTkLabel(self.login_frame, text="CustomTkinter\nLogin Page",
-                                                  font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.login_label.grid(row=0, column=0, padx=30, pady=(150, 15))
-        self.username_entry = customtkinter.CTkEntry(self.login_frame, width=200, placeholder_text="username")
-        self.username_entry.grid(row=1, column=0, padx=30, pady=(15, 15))
-        self.password_entry = customtkinter.CTkEntry(self.login_frame, width=200, show="*", placeholder_text="password")
-        self.password_entry.grid(row=2, column=0, padx=30, pady=(0, 15))
-        self.login_button = customtkinter.CTkButton(self.login_frame, text="Login", command=self.login_event, width=200)
-        self.login_button.grid(row=3, column=0, padx=30, pady=(15, 15))
 
-        # create main frame
-        self.main_frame = customtkinter.CTkFrame(self, corner_radius=0)
-        self.main_frame.grid_columnconfigure(0, weight=1)
-        self.main_label = customtkinter.CTkLabel(self.main_frame, text="CustomTkinter\nMain Page",
-                                                 font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.main_label.grid(row=0, column=0, padx=30, pady=(30, 15))
-        self.back_button = customtkinter.CTkButton(self.main_frame, text="Back", command=self.back_event, width=200)
-        self.back_button.grid(row=1, column=0, padx=30, pady=(15, 15))
-
-    def login_event(self):
-        print("Login pressed - username:", self.username_entry.get(), "password:", self.password_entry.get())
-
-        self.login_frame.grid_forget()  # remove login frame
-        self.main_frame.grid(row=0, column=0, sticky="nsew", padx=100)  # show main frame
-
-    def back_event(self):
-        self.main_frame.grid_forget()  # remove main frame
-        self.login_frame.grid(row=0, column=0, sticky="ns")  # show login frame
+# response = requests.get(f"{api_url}ip")    
+# return_request = response.json()
+# default_tm = return_request.get("timezone")
+# print(default_tm)
+        
+# api_url = "http://worldtimeapi.org/api/timezone/"
+   
+# response = requests.get(f"{api_url}America")
 
 
-if __name__ == "__main__":
-    app = App()
-    app.mainloop()
+# timezones = response.json()
+# print(timezones)
+# print("/n")     
+# timezones = [tz for tz in timezones if tz in pytz.all_timezones]
+# print([pytz.all_timezones])
+# cities = [timezone.split('/')[1] for timezone in timezones]
+# cities = [city.replace('_', ' ') for city in cities]
+
+timezone = pytz.timezone("America/Mexico_City")
+now = datetime.now(timezone)
+
+print(now)

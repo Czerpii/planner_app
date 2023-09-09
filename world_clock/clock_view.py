@@ -13,53 +13,63 @@ class WorldClock(ctk.CTkFrame):
         self.grid(column = col, row=row, sticky='nsew')
         
         self.api_instance = TimeZone()
+        self.timezone = self.api_instance.get_actuall_timezone('both')
+        
         
         self.configure_layout()
-        self.digital_clock_widget()
-        self.timezones_button()
+        self.create_timezones_button()
+        self.create_clock_and_date_frame()
         
-        self.api_instance.display_time(timezone_str=self.api_instance.get_actuall_timezone('both',), widget=self.digital_clock)
-        
+     
+        self.api_instance.display_time(timezone_str=self.timezone, widget=self.digital_clock)
         
     def configure_layout(self):
         self.columnconfigure(0, weight=1, uniform='a')
         self.rowconfigure(0, weight=1, uniform='a')
         self.rowconfigure(1, weight=2, uniform='a')
-        self.rowconfigure(2, weight=1, uniform='a')
         self.grid_propagate(False)
-        
-    
-    
-    
-    def digital_clock_widget(self):
-        
-        #font for digital timer
-        digital_clock_font = ctk.CTkFont(family='Arial Black', size=30)
-        
-        #label for digital timer
-        self.digital_clock = ctk.CTkLabel(self, font = digital_clock_font)
-        self.digital_clock.grid(column=0, row=1, sticky='nsew')
-        
-        
-    
-    def timezones_button(self):
        
-        self.timezones = ctk.CTkLabel(self,
+    
+    
+    def create_clock_and_date_frame(self):
+        
+        frame = ctk.CTkFrame(self, corner_radius=10, fg_color='#007200')
+        frame.grid(column=0, row=1, sticky='nsew', padx=3, pady=5)
+        self.grid_propagate(False)
+        #fonts
+        digital_clock_font = ctk.CTkFont(family='Arial Black', size=22)
+        date_font = ctk.CTkFont(family='Arial Black', size=10)
+        
+        self.date_label = ctk.CTkLabel(frame,
+                                  text=self.api_instance.get_current_date_with_weekday(self.timezone),
+                                  font =date_font )
+        self.date_label.pack(side='top', anchor='center', pady=5)
+        
+        self.digital_clock = ctk.CTkLabel(frame, font = digital_clock_font)
+        self.digital_clock.pack(side='top', anchor='center')
+        
+      
+    
+    def create_timezones_button(self):
+       
+        self.timezones = ctk.CTkButton(self,
                                  text =f"{self.api_instance.get_actuall_timezone('region')}, {self.api_instance.get_actuall_timezone('city')}",
-                                 fg_color='black',
+                                 fg_color='#007200',
+                                 hover_color="#008000",
                                  font = ctk.CTkFont(family='Arial Black', size=10), 
-                                 corner_radius=10)
-        self.timezones.grid(column=0, row=0, sticky='nsew', padx=2, pady=1)
+                                 corner_radius=10,
+                                 command= self.open_time_zone_window)
+        self.timezones.grid(column=0, row=0, sticky='nsew', padx=3, pady=5)
         self.timezones.grid_propagate(False)
         
         
-        self.timezones.bind("<Button-1>", self.open_time_zone_window )
-        self.timezone = self.api_instance.get_actuall_timezone('both')
+        
+        
         
         
         
    
-    def open_time_zone_window(self, event):
+    def open_time_zone_window(self):
         button_text = self.timezones.cget('text')
         self.region, self.city = button_text.split(", ")
         
@@ -71,6 +81,7 @@ class WorldClock(ctk.CTkFrame):
         
         self.api_instance.stop_display_time(self.digital_clock)
         self.api_instance.start_display_time(timezone=timezone, widget=self.digital_clock)
+        self.date_label.configure(self.api_instance.get_current_date_with_weekday(timezone))
         
 class TimezonesWindow(ctk.CTkToplevel):
     def __init__(self, parent, region, city, timezone):

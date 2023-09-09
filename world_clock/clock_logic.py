@@ -57,10 +57,29 @@ class TimeZone():
         
         timezone = pytz.timezone(timezone_str)
         now = datetime.now(timezone)
-        formatted_time = now.strftime('%H:%M:%S')
+        formatted_time = now.strftime('%H:%M:%S %p')
         widget.configure(text = formatted_time)
         self.after_id = widget.after(1000, self.display_time, timezone_str, widget)
             
+    def get_current_date_with_weekday(self, timezone_str):
+        days_translation = {
+        'Monday': 'Poniedziałek',
+        'Tuesday': 'Wtorek',
+        'Wednesday': 'Środa',
+        'Thursday': 'Czwartek',
+        'Friday': 'Piątek',
+        'Saturday': 'Sobota',
+        'Sunday': 'Niedziela'
+    }
+    
+        timezone = pytz.timezone(timezone_str)
+        current_datetime = datetime.now(timezone)
+        day_english = current_datetime.strftime('%A')
+        day_polish = days_translation[day_english]
+        
+        formatted_date = current_datetime.strftime(f'{day_polish} %d-%m-%Y')
+        return formatted_date
+        
     
     
     def stop_display_time(self, widget):

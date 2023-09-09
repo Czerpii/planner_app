@@ -47,7 +47,7 @@ class EditTaskWindow(ctk.CTkToplevel):
 
         self.lift(parent)
         self.transient(parent)
-        self.title("Nowe zadanie")
+        self.title("Edytuj zadanie")
         
 
         self.invoker = Invoker()
