@@ -1,5 +1,5 @@
 import json, csv, os
-from PathSingleton import *
+from UserSingleton import *
 
 
 
@@ -7,7 +7,7 @@ from PathSingleton import *
 class NoteManager():
     def __init__(self):
         
-        singleton = PathSingleton()
+        singleton = UserSingleton()
         self.pathname = singleton.folder_path
         
         self.note_file = os.path.join(self.pathname, "notes.csv")

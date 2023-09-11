@@ -33,8 +33,8 @@ class WorldClock(ctk.CTkFrame):
     
     def create_clock_and_date_frame(self):
         
-        frame = ctk.CTkFrame(self, corner_radius=10, fg_color='#007200')
-        frame.grid(column=0, row=1, sticky='nsew', padx=3, pady=5)
+        frame = ctk.CTkFrame(self, corner_radius=5, fg_color='#007200')
+        frame.grid(column=0, row=1, sticky='nsew', padx=3, pady=2)
         self.grid_propagate(False)
         #fonts
         digital_clock_font = ctk.CTkFont(family='Arial Black', size=22)
@@ -57,17 +57,10 @@ class WorldClock(ctk.CTkFrame):
                                  fg_color='#007200',
                                  hover_color="#008000",
                                  font = ctk.CTkFont(family='Arial Black', size=10), 
-                                 corner_radius=10,
+                                 corner_radius=5,
                                  command= self.open_time_zone_window)
-        self.timezones.grid(column=0, row=0, sticky='nsew', padx=3, pady=5)
+        self.timezones.grid(column=0, row=0, sticky='nsew', padx=3, pady=2)
         self.timezones.grid_propagate(False)
-        
-        
-        
-        
-        
-        
-        
    
     def open_time_zone_window(self):
         button_text = self.timezones.cget('text')
@@ -101,11 +94,14 @@ class TimezonesWindow(ctk.CTkToplevel):
         
     
     def setup_window(self):
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        center_x = int(screen_width / 2 - 700 / 2)
-        center_y = int(screen_height / 2 - 400 / 2)
-        self.geometry(f'700x500+{center_x}+{center_y}')
+        # screen_width = self.winfo_screenwidth()
+        # screen_height = self.winfo_screenheight()
+        # center_x = int(screen_width / 2 - 700 / 2)
+        # center_y = int(screen_height / 2 - 400 / 2)
+        x_pos = self.parent.winfo_rootx()
+        y_pos = self.parent.winfo_rooty()
+        
+        self.geometry(f'700x500+{x_pos-800}+{y_pos+100}')
         self.maxsize(700, 500)
         self.minsize(700, 500)
 
