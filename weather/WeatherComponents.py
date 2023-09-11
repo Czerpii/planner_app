@@ -1,23 +1,23 @@
 import customtkinter as ctk
 from weather.OpenWeatherMap import *
-from location.IpapiLocation import *
+from location.ApiLocation import *
 from PIL import Image, ImageTk
 
 
 
 class LocationPanel(ctk.CTkFrame):
-    def __init__(self, parent, col, row, weather_panel):
-        super().__init__(parent, fg_color='transparent')
-        self.grid(column = col, row = row, sticky = 'nsew')
+    def __init__(self, parent, col, row, weather_daily_panel, weather_forecast_panel):
+        super().__init__(parent, fg_color='#007200', corner_radius=5)
+        self.grid(column = col, row = row, sticky = 'nsew', pady=3, padx=3)
          
-        self.location = IpapiLocation()
-        self.weather_panel = weather_panel
+        self.location = ApiLocation()
+        self.weather_daily_panel = weather_daily_panel
+        self.weather_forecast_panel =weather_forecast_panel
         
         
         #layout
         self.columnconfigure(0, weight=1, uniform='a')
-        self.rowconfigure(0, weight=2,uniform='a')
-        self.rowconfigure(1, weight=1,uniform='a')
+        self.rowconfigure(0, weight=1,uniform='a')
         
         
         #combobox
@@ -30,13 +30,14 @@ class LocationPanel(ctk.CTkFrame):
                         command=self.choose_location)
         
         self.combo.set(self.location.get_location_with_default_state())
-        self.combo.grid(column = 0, row =0, sticky = 'nsew', pady = 5) 
+        self.combo.grid(column = 0, row =0, sticky = 'nsew', pady = 4, padx=3) 
         self.combo.bind('<Return>', self.add_new)
       
-    def choose_location(self, event): #przekazanie lokalizacji, wybranej w comboboxie, do weatherprovider
+    def choose_location(self, event):
         actuall_value = self.combo.get().split(',')
         self.location.set_default_state(actuall_value[0])
-        self.weather_panel.update_weather()
+        self.weather_daily_panel.update_daily_weather()
+        self.weather_forecast_panel.update_forecast_weather()
      
     def add_new(self, event):
         new_item = self.combo.get().split(',')
@@ -49,12 +50,12 @@ class LocationPanel(ctk.CTkFrame):
         
          
                
-class WeatherPanel(ctk.CTkFrame):
+class WeatherDailyPanel(ctk.CTkFrame):
     def __init__(self, parent, col, row):
-        super().__init__(parent, fg_color='transparent')
-        self.grid(column=col, row=row, sticky='nsew')
+        super().__init__(parent, fg_color='transparent', corner_radius=5)
+        self.grid(column=col, row=row, sticky='nsew', padx=3, pady=3)
         
-        weather =  OpenWeaterMap.get_weather_today(IpapiLocation().get_location_with_default_state())
+        weather =  OpenWeaterMap.get_weather_today(ApiLocation().get_location_with_default_state())
         self.parent = parent
         
         
@@ -62,10 +63,7 @@ class WeatherPanel(ctk.CTkFrame):
         self.columnconfigure(1, weight=1, uniform='a')
         self.rowconfigure(0, weight=2, uniform='a')
         self.rowconfigure((1,2,3,4,5), weight=1, uniform='a')
-        
-        
-        
-        
+        self.grid_propagate(False)
         
         #nazwy
         ctk.CTkLabel(self,
@@ -79,18 +77,20 @@ class WeatherPanel(ctk.CTkFrame):
         
         #wartości
         self.temperature_frame = ctk.CTkFrame(self, fg_color='transparent')
-        self.temperature_frame.grid(column=0, row=0, columnspan=2, sticky='nsew')      
+        self.temperature_frame.grid(column=0, row=0, columnspan=2, sticky='nsew', padx=2, pady=2)      
         self.temperature_frame.columnconfigure(0, weight=1, uniform='a')  
         self.temperature_frame.columnconfigure(1, weight=3, uniform='a')  
-        self.temperature_frame.rowconfigure(0, weight=0, uniform='a')  
+        self.temperature_frame.rowconfigure(0, weight=0, uniform='a')
+        self.temperature_frame.grid_propagate(False)
 
         self.ico_label = ctk.CTkLabel(self.temperature_frame, text="")
-        self.ico_label.grid(column=0, row = 0, sticky = 'nsew')
+        self.ico_label.grid(column=0, row = 0, sticky = 'nsew', pady=5, padx=3)
           
         self.temperature_label = ctk.CTkLabel(self.temperature_frame,
                      text = f"{weather['temp']}\N{DEGREE SIGN}C",
-                     font = ctk.CTkFont(family='Calibri', size=50, weight='bold'))
-        self.temperature_label.grid(column=1 ,row = 0, sticky = 'nsew')
+                     font = ctk.CTkFont(family='Calibri', size=50, weight='bold'),
+                    )
+        self.temperature_label.grid(column=1 ,row = 0, sticky = 'nsew', pady=5, padx=3)
         
         self.description_label = ctk.CTkLabel(self, text=f"{weather['description']}")
         self.description_label.grid(column=0, columnspan =2, row = 1, sticky = 'nsew')
@@ -108,9 +108,10 @@ class WeatherPanel(ctk.CTkFrame):
 
         self.set_icon_based_on_weather_status(weather['weather_ico'])
         self.set_background_based_on_weather_status(weather['weather_main'])
+        self.start_updating_weather()
 
-    def update_weather(self):
-        location = IpapiLocation().get_location_with_default_state()
+    def update_daily_weather(self):
+        location = ApiLocation().get_location_with_default_state()
         weather = OpenWeaterMap.get_weather_today(location)
 
         # Zaktualizuj etykiety z informacjami o pogodzie
@@ -125,6 +126,10 @@ class WeatherPanel(ctk.CTkFrame):
         self.set_background_based_on_weather_status(weather['weather_main'])
         self.set_icon_based_on_weather_status(weather['weather_ico'])
     
+    def start_updating_weather(self, interval=600000):
+        """Upadate weather"""
+        self.update_daily_weather()
+        self.after(interval, self.start_updating_weather, interval)
     
     def set_icon_based_on_weather_status(self, weather_ico):
         image = ctk.CTkImage(Image.open(f"./weather/weather_status_image/{weather_ico}.png"), size=(50,50))
@@ -143,4 +148,84 @@ class WeatherPanel(ctk.CTkFrame):
         }
         color = background_color[weather_condition]
         
-        self.parent.configure(fg_color = color)
+        self.configure(fg_color = color)
+        
+        
+        
+class Weather5DaysPanel(ctk.CTkFrame):
+    def __init__(self, parent, col, row):
+        super().__init__(parent, fg_color="#007200", corner_radius=5)
+        self.grid(column=col, row=row, sticky='nsew', padx=3, pady=3)
+        
+        self.default_weather = OpenWeaterMap.get_5_days_forecast(ApiLocation().get_location_with_default_state(), self.format_date)
+        
+        
+        self.configure_layout()
+        self.create_date_labels()
+        self.create_temp_labels()
+        
+        
+        
+    def configure_layout(self):
+        self.columnconfigure((0,1), weight=1, uniform='a')
+        self.rowconfigure((0,1,2,3,4), weight=1, uniform='a')
+        self.grid_propagate(False)
+        
+    
+    def create_date_labels(self):
+        row = 0
+        font = ctk.CTkFont(family='Arial Black', size=12)
+        
+        for date in self.default_weather.keys():
+            day_of_week, day_and_month = date.split(', ')
+            formatted_date = f"{day_of_week}\n{day_and_month}"
+            ctk.CTkLabel(self, text=formatted_date, font=font).grid(column=0, row=row, sticky="nsew", padx=2, pady=2)
+            row += 1
+            
+    
+    def create_temp_labels(self):
+        row=0
+        font = ctk.CTkFont(family='Arial Black', size=12)
+        
+        for key, value in self.default_weather.items():
+            avg_temp = value['średnia_temperatura']
+            icon = value['icon']
+            
+            frame  = ctk.CTkFrame(self, fg_color='transparent')
+            frame.grid(column=1, row=row, sticky='nsew', padx=2, pady=2)
+            ctk.CTkLabel(frame,
+                         text='',
+                         image=ctk.CTkImage(Image.open(f"./weather/weather_status_image/{icon}.png"), size=(30,30))).pack(side='left')
+            ctk.CTkLabel(frame,
+                         text=f"{avg_temp}\N{DEGREE SIGN}C",
+                         font = font ).pack(side ='left')
+            row+=1
+    
+    
+    def update_forecast_weather(self):
+        location = ApiLocation().get_location_with_default_state()
+        self.default_weather = OpenWeaterMap.get_5_days_forecast(location, self.format_date)
+        
+        for widget in self.winfo_children():
+            widget.destroy()
+            
+        self.configure_layout()
+        self.create_date_labels()
+        self.create_temp_labels()
+             
+    def set_icon_based_on_weather_status(self, weather_ico):
+        image = ctk.CTkImage(Image.open(f"./weather/weather_status_image/{weather_ico}.png"), size=(50,50))
+        self.ico_label.configure(image=image)
+    
+     
+    def format_date(self, date_str):
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+        
+        days_pl = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Niedz"]
+        months_pl = ["Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru"]
+        
+        formatted_date = f"{days_pl[date_obj.weekday()]}, {date_obj.day} {months_pl[date_obj.month-1]}"
+        
+        return formatted_date   
+    
+    

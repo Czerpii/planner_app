@@ -7,7 +7,7 @@ from location.ILocationProvider import *
 
 
 
-class IpapiLocation(ILocationProvider):
+class ApiLocation(ILocationProvider):
     def __init__(self):
         
         current_path = os.path.dirname(os.path.realpath(__file__))

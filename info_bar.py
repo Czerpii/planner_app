@@ -10,9 +10,8 @@ class InfoBar(CTkFrame):
         # layout
         self.columnconfigure(0, weight=1, uniform='a')
         self.rowconfigure(0, weight=1, uniform='a')
-        self.rowconfigure(1, weight=2, uniform='a')
-        self.rowconfigure(2, weight=2, uniform='a')
+        self.rowconfigure(1, weight=4, uniform='a')
 
         # widget
-        WeatherWidget(self, col=0, row=2)
+        WeatherWidget(self, col=0, row=1)
         WorldClock(self, col=0, row=0)
