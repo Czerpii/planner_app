@@ -1,13 +1,14 @@
 import os
 
-class PathSingleton:
+class UserSingleton:
     
     _instance = None
+    _password = None
     folder_path = None
     
     def __new__(cls):
         if cls._instance is None:
-            cls._instance = super(PathSingleton, cls).__new__(cls)
+            cls._instance = super(UserSingleton, cls).__new__(cls)
         return cls._instance
     
     
@@ -20,4 +21,7 @@ class PathSingleton:
         if not os.path.exists(cls.folder_path):
             os.makedirs(cls.folder_path)
         
-       
+    
+    @classmethod
+    def set_password(cls, password):
+        cls._password = password

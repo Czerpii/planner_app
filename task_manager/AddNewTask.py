@@ -203,7 +203,7 @@ class AddTaskParameters(ctk.CTkToplevel):
         self.parent = new_task_window_instance
         self.data_name = data_name
         
-        singleton = PathSingleton()
+        singleton = UserSingleton()
         self.pathname = singleton.folder_path
         self.data_file = os.path.join(self.pathname, f"{data_name}.csv")
         self.data_list = []

@@ -1,7 +1,7 @@
 import json
 import hashlib
 import os
-from PathSingleton import *
+from UserSingleton import *
 
 
 
@@ -10,6 +10,7 @@ class Users:
         
        self.view_instance = parent
        self.pathname = os.path.join(os.path.dirname(os.path.realpath(__file__)), "users.json")
+       self.singleton = UserSingleton()
        
     def save_user(self, users):
         with open(self.pathname, "w") as f:
@@ -70,8 +71,9 @@ class Users:
             self.view_instance.info_message.configure(text="Błędne hasło")
             return False
 
-        singleton = PathSingleton()
-        singleton.set_folder_path(username)
+        hashed_password = self.hash_password(password)
+        self.singleton.set_folder_path(username)
+        self.singleton.set_password(hashed_password)
 
 
         return True
@@ -105,8 +107,8 @@ class Users:
         users[username] = {"email": email, "password": hashed_password}
         self.save_user(users)
         
-        singleton = PathSingleton()
-        singleton.set_folder_path(username)
+        self.singleton.set_folder_path(username)
+        self.singleton.set_password(hashed_password)
 
         return True
     

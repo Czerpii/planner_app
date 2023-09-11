@@ -24,10 +24,10 @@ class TaskManagerMain(ctk.CTkFrame):
         super().__init__(parent, fg_color="transparent", corner_radius=0, border_width=0)
         self.grid(column = col, row=row, sticky = "nsew")
 
-        singleton = PathSingleton()
-        self.pathname = singleton.folder_path
-        self.tasks_file = os.path.join(self.pathname, "tasks.csv")
-        self.status_file = os.path.join(self.pathname, "status.csv" )
+        # singleton = UserSingleton()
+        # self.pathname = singleton.folder_path
+        # self.tasks_file = os.path.join(self.pathname, "tasks.csv")
+        # self.status_file = os.path.join(self.pathname, "status.csv" )
         
         self.initialize_variables()
         self.configure_layout()
@@ -416,6 +416,8 @@ class TaskManagerButtonBar(ctk.CTkFrame):
             self.toplevel_window = NewTaskWindow(self.parent, self.task_manager_table, self.task_manager_tiles)
         else:
             self.toplevel_window.focus()
+        
+        singleton = UserSingleton()
 
     def edit_task_button_click(self):
         
@@ -448,7 +450,7 @@ class TaskManagerButtonBar(ctk.CTkFrame):
             data.append(self.task_manager_table.task_list.item(item)['values'])
         
         task=TaskManager()
-        delete_task_command = Delete(task, data)
+        delete_task_command = Delete(task, id_task)
         self.invoker.set_command(delete_task_command)
         self.invoker.press_button()
            
