@@ -3,7 +3,7 @@ weather/__pycache__/
 location/__pycache__/
 location.csv
 .DS_Store
-tasks.csv
+tasks.csv.aes
 priority.csv
 status.csv
 tag.csv
@@ -12,3 +12,6 @@ test2.py
 users.json
 .idea
 notes.csv
+test.py
+test2.py
+
