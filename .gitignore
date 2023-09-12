@@ -11,7 +11,5 @@ test.py
 test2.py
 users.json
 .idea
-notes.csv
-test.py
-test2.py
+notes.csv.aes
 
