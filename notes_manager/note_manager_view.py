@@ -96,7 +96,7 @@ class NoteManagerNoteBar(ctk.CTkFrame):
         self.expanded_frame.pack_forget()
         
         self.bind("<Button-1>", self.off_focus) 
-    
+          
     def create_default_frame(self):
         
         self.default_frame = ctk.CTkFrame(self, fg_color=NOTE_FG, width=500, border_width=3, border_color=NOTE_BORDER, corner_radius=10)
@@ -253,8 +253,9 @@ class NoteManagerNotesTiles(ctk.CTkScrollableFrame):
         ctk.CTkLabel(master=self.columns[2], text="text", fg_color='yellow', height=400).pack(side='top', expand='true', fill='both', padx=2, pady=2)
         
         ctk.CTkLabel(master=self.columns[3], text="text", fg_color='blue', height=200).pack(side='top', expand='true', fill='both', padx=2, pady=2)
-     
 
+
+# noinspection GrazieInspection
 class NoteTile(ctk.CTkFrame):
     """NoteTile is a custom frame for displaying a note with title and description."""
     
