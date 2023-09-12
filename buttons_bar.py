@@ -18,6 +18,8 @@ class ButtonsBar(ctk.CTkFrame):
         :param row: Row position for grid placement.
         """
         super().__init__(parent, fg_color='#004B23', corner_radius=0)
+        self.task_manager_button = None
+        self.note_button = None
         self.grid(column=col, row=row, sticky='nsew',)
         self.parent = parent
         self.current_view = None
@@ -45,7 +47,7 @@ class ButtonsBar(ctk.CTkFrame):
         self.task_manager_button.grid(column=0, row=0, sticky='ns', padx=5, pady=2)
 
         # NoteManager Button
-        self.note_button = self.create_button(note_image, self.note_manager_button_click)
+        self.note_button = self.create_button(note_image,self.note_manager_button_click)
         self.note_button.grid(column=1, row=0, sticky='ns', pady=2)
 
     def load_image(self, path, size):
@@ -64,7 +66,7 @@ class ButtonsBar(ctk.CTkFrame):
         :param command: Command to execute when the button is clicked.
         :return: Created button.
         """
-        return ctk.CTkButton(self, text="", fg_color='transparent', hover_color="#5F5F5F", image=image, command=command)
+        return ctk.CTkButton(self, text="", fg_color='transparent', hover_color="#007200", image=image, command=command)
 
     def switch_view(self, new_view):
         """Switch to the given view, hiding the current one."""
