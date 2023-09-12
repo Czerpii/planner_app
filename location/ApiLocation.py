@@ -99,7 +99,3 @@ class ApiLocation(ILocationProvider):
         with urllib.request.urlopen("https://ipapi.co/json/") as url:
             data = json.loads(url.read().decode())
             self.add_location(data['city'])
-                  
-
-# loc = IpapiLocation()
-# loc.get_all_location()

@@ -37,6 +37,7 @@ class NewTaskWindow(ctk.CTkToplevel):
     def __init__(self, parent, task_manager_table_instance, task_manager_tiles_instance):
         super().__init__(parent, fg_color=TOP_LEVEL_FG)
         # centrowanie okna
+        self.cal_widget = None
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         center_x = int(screen_width / 2 - 300 / 2)
@@ -200,6 +201,8 @@ class NewTaskWindow(ctk.CTkToplevel):
 class AddTaskParameters(ctk.CTkToplevel):
     def __init__(self, parent, data_name, new_task_window_instance):
         super().__init__(parent)
+        self.entry_box = None
+        self.button_parameters = None
         self.parent = new_task_window_instance
         self.data_name = data_name
         

@@ -3,7 +3,7 @@ import os
 class UserSingleton:
     
     _instance = None
-    _password = None
+    password = None
     folder_path = None
     
     def __new__(cls):
@@ -24,4 +24,4 @@ class UserSingleton:
     
     @classmethod
     def set_password(cls, password):
-        cls._password = password
+        cls.password = password

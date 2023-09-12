@@ -8,7 +8,7 @@ class TaskManager():
         singleton = UserSingleton()
         self.pathname = singleton.folder_path
         self.bufferSize = 64 * 1024
-        self.password = singleton._password
+        self.password = singleton.password
         
         self.tasks_file_encrypted = os.path.join(self.pathname, "tasks.csv.aes")
         self.temp_file = os.path.join(self.pathname, "tasks.csv")
