@@ -3,7 +3,7 @@ import customtkinter as ctk
 import pytz 
 import time as tm
 from world_clock.clock_logic import *
-
+import themes_manager
 
 
 
@@ -33,7 +33,7 @@ class WorldClock(ctk.CTkFrame):
     
     def create_clock_and_date_frame(self):
         
-        frame = ctk.CTkFrame(self, corner_radius=5, fg_color='#007200')
+        frame = ctk.CTkFrame(self, corner_radius=5, fg_color=themes_manager.get_color("foreground_infobar"))
         frame.grid(column=0, row=1, sticky='nsew', padx=3, pady=2)
         self.grid_propagate(False)
         #fonts
@@ -54,8 +54,8 @@ class WorldClock(ctk.CTkFrame):
        
         self.timezones = ctk.CTkButton(self,
                                  text =f"{self.api_instance.get_actuall_timezone('region')}, {self.api_instance.get_actuall_timezone('city')}",
-                                 fg_color='#007200',
-                                 hover_color="#008000",
+                                 fg_color=themes_manager.get_color("button"),
+                                 hover_color=themes_manager.get_color("button_hover"),
                                  font = ctk.CTkFont(family='Arial Black', size=10), 
                                  corner_radius=5,
                                  command= self.open_time_zone_window)
@@ -78,7 +78,7 @@ class WorldClock(ctk.CTkFrame):
         
 class TimezonesWindow(ctk.CTkToplevel):
     def __init__(self, parent, region, city, timezone):
-        super().__init__(parent)
+        super().__init__(parent, fg_color=themes_manager.get_color('background'))
         
         self.parent = parent
         self.api_instance = TimeZone()
@@ -156,7 +156,7 @@ class TimezonesWindow(ctk.CTkToplevel):
         regions = ["Europa", "Ameryka", "Afryka", "Azja", "Oceania"]
         
         for region in regions:
-            ctk.CTkButton(frame, text=region, command=lambda region=region: self.set_region(region)).pack(side='left', padx=2, fill='both')
+            ctk.CTkButton(frame, text=region, fg_color=themes_manager.get_color('button'), hover_color=themes_manager.get_color('button_hover'),command=lambda region=region: self.set_region(region)).pack(side='left', padx=2, fill='both')
         
     
     def cities_frame(self, region):
@@ -164,7 +164,7 @@ class TimezonesWindow(ctk.CTkToplevel):
         self.cities = self.api_instance.get_cities(region)
         self.search_var = ctk.StringVar()
         
-        search_entry = ctk.CTkEntry(self, placeholder_text='Szukaj', textvariable=self.search_var)
+        search_entry = ctk.CTkEntry(self, placeholder_text='Szukaj', fg_color=themes_manager.get_color('entry'), border_width=0, textvariable=self.search_var)
         search_entry.grid(column=0, columnspan=3, row=2, sticky='nsew', padx=10, pady=5)
         self.search_var.trace('w', self.filter_cities)
         
@@ -181,10 +181,10 @@ class TimezonesWindow(ctk.CTkToplevel):
         frame = ctk.CTkFrame(self, fg_color='transparent')
         frame.grid(column=0, row=4, sticky='nsew')
         
-        save_button = ctk.CTkButton(frame, text='Zapisz', command=self.save_button_click)
+        save_button = ctk.CTkButton(frame, text='Zapisz',fg_color=themes_manager.get_color('button'), hover_color=themes_manager.get_color('button_hover'), command=self.save_button_click)
         save_button.pack(side='right', fill='both', padx=4, pady=4)
         
-        cancel_button = ctk.CTkButton(frame, text='Anuluj', command=lambda: self.destroy())
+        cancel_button = ctk.CTkButton(frame, text='Anuluj',fg_color=themes_manager.get_color('button'), hover_color=themes_manager.get_color('button_hover'), command=lambda: self.destroy())
         cancel_button.pack(side='right', fill='both', padx=4, pady=4)
                 
     
@@ -206,6 +206,8 @@ class TimezonesWindow(ctk.CTkToplevel):
             city = timezone.split('/')[-1].replace('_', ' ')
             ctk.CTkButton(self.scroll_frame,
                          text=city,
+                         fg_color=themes_manager.get_color('button'),
+                         hover_color=themes_manager.get_color('button_hover'),
                         command=lambda city=city, timezone=timezone: self.city_button_click(city, timezone)).grid(column=column, row=row, sticky='nsew', padx=2, pady=2)
             column += 1
             if column == 3:

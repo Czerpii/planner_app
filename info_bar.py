@@ -1,10 +1,11 @@
 from customtkinter import CTkFrame
 from weather.WeatherWidget import *
 from world_clock.clock_view import WorldClock
+import themes_manager
 
 class InfoBar(CTkFrame):
     def __init__(self, parent, col, row, rowspan):
-        super().__init__(master=parent, fg_color='#004B23', corner_radius=0)
+        super().__init__(master=parent, fg_color=themes_manager.get_color('background'), corner_radius=0)
         self.grid(column=col, row=row, rowspan=rowspan, sticky='nsew')
 
         # layout

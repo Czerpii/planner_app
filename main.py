@@ -5,6 +5,7 @@ from info_bar import *
 from buttons_bar import *
 from task_manager.task_manager_view import TaskManagerMain
 from users_management.user_management_view import *
+import themes_manager
 
 try:
     from ctypes import windll, byref, sizeof, c_int
@@ -16,7 +17,7 @@ class Main(ctk.CTk):
     
     def __init__(self):
         """Initialize the main application window."""
-        super().__init__(fg_color="#004B23")
+        super().__init__(fg_color=themes_manager.get_color("background"))
         self.setup_window()
         self.user_management_view()
         self.mainloop()
@@ -44,7 +45,7 @@ class Main(ctk.CTk):
         try:
             HWND = windll.user32.GetParent(self.winfo_id())
             DWMWA_ATTRIBUTE = 35
-            COLOR = TITLE_BAR_COLOR_GREEN
+            COLOR = themes_manager.get_color("bar")
             windll.dwmapi.DwmSetWindowAttribute(HWND, DWMWA_ATTRIBUTE, byref(c_int(COLOR)), sizeof(c_int))
         except:
             pass
@@ -72,9 +73,9 @@ class Main(ctk.CTk):
         """Create and configure UI elements for the main view."""
         self.configure_grid_main_view()
         InfoBar(self, col=1, row=0, rowspan=2)
-        buttons_bar = ButtonsBar(self, 0, 0)
-        default_view = TaskManagerMain(self, 0, 1)
-        buttons_bar.switch_view(default_view)
+        ButtonsBar(self, 0, 0)
+        # default_view = TaskManagerMain(self, 0, 1)
+        # buttons_bar.switch_view(default_view)
 
     def configure_grid_main_view(self):
         """Configure grid settings for the main view layout."""
@@ -82,7 +83,7 @@ class Main(ctk.CTk):
         self.columnconfigure(1, weight=1, uniform='a')
         self.rowconfigure(0, weight=1, uniform='a')
         self.rowconfigure(1, weight=15, uniform='a')
-        self.configure(fg_color="#004B23")
+        self.configure(fg_color=themes_manager.get_color('background'))
 
     def main_view(self, instance):
         """Display the main application view.

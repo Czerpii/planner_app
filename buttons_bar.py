@@ -3,6 +3,7 @@ import customtkinter as ctk
 from PIL import Image
 from task_manager.task_manager_view import TaskManagerMain
 from notes_manager.note_manager_view import NoteManagerMain
+import themes_manager
 
 class ButtonsBar(ctk.CTkFrame):
     """
@@ -17,7 +18,7 @@ class ButtonsBar(ctk.CTkFrame):
         :param col: Column position for grid placement.
         :param row: Row position for grid placement.
         """
-        super().__init__(parent, fg_color='#004B23', corner_radius=0)
+        super().__init__(parent, fg_color=themes_manager.get_color("background"), corner_radius=0)
         self.task_manager_button = None
         self.note_button = None
         self.grid(column=col, row=row, sticky='nsew',)
@@ -28,6 +29,7 @@ class ButtonsBar(ctk.CTkFrame):
         self.task_manager_view = TaskManagerMain(self.parent, 0, 1)
         self.note_manager_view = NoteManagerMain(self.parent, 0, 1)
         self.note_manager_view.grid_forget()
+        self.task_manager_view.grid_forget()
 
         # UI setup
         self.setup_ui_elements()
@@ -66,7 +68,7 @@ class ButtonsBar(ctk.CTkFrame):
         :param command: Command to execute when the button is clicked.
         :return: Created button.
         """
-        return ctk.CTkButton(self, text="", fg_color='transparent', hover_color="#007200", image=image, command=command)
+        return ctk.CTkButton(self, text="", fg_color=themes_manager.get_color("button"), hover_color=themes_manager.get_color('button_hover'), image=image, command=command)
 
     def switch_view(self, new_view):
         """Switch to the given view, hiding the current one."""

@@ -2,12 +2,12 @@ import customtkinter as ctk
 from weather.OpenWeatherMap import *
 from location.ApiLocation import *
 from PIL import Image, ImageTk
-
+import themes_manager
 
 
 class LocationPanel(ctk.CTkFrame):
     def __init__(self, parent, col, row, weather_daily_panel, weather_forecast_panel):
-        super().__init__(parent, fg_color='#007200', corner_radius=5)
+        super().__init__(parent, fg_color=themes_manager.get_color("foreground_infobar"), corner_radius=5)
         self.grid(column = col, row = row, sticky = 'nsew', pady=3, padx=3)
          
         self.location = ApiLocation()
@@ -24,6 +24,12 @@ class LocationPanel(ctk.CTkFrame):
         combobox_value = self.location.get_all_location()
         self.combo = ctk.CTkComboBox(self, 
                         values=combobox_value,
+                        fg_color=themes_manager.get_color('entry'),
+                        button_color=themes_manager.get_color("button"),
+                        button_hover_color=themes_manager.get_color("button_hover"),
+                        border_width=0,
+                        dropdown_fg_color=themes_manager.get_color('background'),
+                        dropdown_hover_color=themes_manager.get_color("button_hover"),
                         corner_radius=10,
                         state = 'normal',
                         justify='left',
@@ -154,7 +160,7 @@ class WeatherDailyPanel(ctk.CTkFrame):
         
 class Weather5DaysPanel(ctk.CTkFrame):
     def __init__(self, parent, col, row):
-        super().__init__(parent, fg_color="#007200", corner_radius=5)
+        super().__init__(parent, fg_color=themes_manager.get_color("foreground_infobar"), corner_radius=5)
         self.grid(column=col, row=row, sticky='nsew', padx=3, pady=3)
         
         self.default_weather = OpenWeaterMap.get_5_days_forecast(ApiLocation().get_location_with_default_state(), self.format_date)
