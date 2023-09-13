@@ -5,7 +5,7 @@ import random
 
 import customtkinter as ctk
 
-from task_manager.calendar_widget import CalendarDateEntry
+from task_manager.deadline_toplevel import *
 from ICommand import Save, Edit
 from invoker import Invoker
 from task_manager.task_manager_reciver import *
@@ -124,7 +124,7 @@ class TaskWindow(ctk.CTkToplevel):
                                          corner_radius=5)
         self.status_list.grid(column=col, row=row, sticky="nsew", pady=2, padx=2)
     
-    def create_date_button(self, col, row, text="Bezterminowo"):
+    def create_deadline_buttons(self, col, row, text="Bezterminowo"):
         """Creates the date selection button widget."""
         self.date_button = ctk.CTkButton(self,
                                          text=text,
@@ -166,7 +166,7 @@ class TaskWindow(ctk.CTkToplevel):
         self.create_title_entry(col=0, row=0)
         self.create_description_entry(col=1, row=1)
         self.create_status_button(col=1, row=2)
-        self.create_date_button(col=1, row=3)
+        self.create_deadline_buttons(col=1, row=3)
         self.create_priority_button(col=1, row=4)
         self.create_tag_button(col=1, row=5)
         
@@ -179,11 +179,11 @@ class TaskWindow(ctk.CTkToplevel):
         self.title_entry.insert(0, self.task_data['title'])
         
         self.create_description_entry(col=1, row=1)
-        self.desc_textbox.delete("1.0", "end")
+        self.desc_textbox.delete("0.0", "end")
         self.desc_textbox.insert("end", self.task_data['description'])
         
         self.create_status_button(col=1, row=2, text=self.task_data['status'])
-        self.create_date_button(col=1, row=3, text=self.task_data['deadline'])
+        self.create_deadline_buttons(col=1, row=3, text=self.task_data['deadline'])
         self.create_priority_button(col=1, row=4, text=self.task_data['priority'])
         self.create_tag_button(col=1, row=5, text=self.task_data['tag'])
         
@@ -271,28 +271,34 @@ class TaskWindow(ctk.CTkToplevel):
         self.invoker.set_command(edit_task_command)
         self.invoker.press_button()
         self.task_manager_table_instance.edit_chosen_task(self.selected_item_id, **params)
-        self.task_manager_tiles_instance.edit_tile(self.selected_item_id, params['title'], params['priority'], params['deadline'], params['status'])
+        self.task_manager_tiles_instance.edit_tile(self.selected_item_id, params['title'], params['priority'], params['status'])
         
         self.destroy()
 
     def open_calendar_button_click(self):
         """Open calendar widget"""
-        x_pos = self.date_button.winfo_rootx()
-        y_pos = self.date_button.winfo_rooty()
+        # x_pos = self.date_button.winfo_rootx()
+        # y_pos = self.date_button.winfo_rooty()
 
-        self.cal_widget = ctk.CTkToplevel(self)
-        self.cal_widget.geometry(f"210x210+{x_pos}+{y_pos}")
-        self.cal_widget.title("Wybierz date")
-        self.cal_widget.overrideredirect(True)
-        self.cal_widget.transient(self)
+        # self.cal_widget = ctk.CTkToplevel(self)
+        # self.cal_widget.geometry(f"210x210+{x_pos}+{y_pos}")
+        # self.cal_widget.title("Wybierz date")
+        # self.cal_widget.overrideredirect(True)
+        # self.cal_widget.transient(self)
 
-        cal = CalendarDateEntry(self.cal_widget, on_date_select=self.set_date_entry)
+        # cal = CalendarDateEntry(self.cal_widget, on_date_select=self.set_date_entry)
+        self.deadline_window = DeadlineWindow(self, self.date_button, self.set_date_entry)
 
-    def set_date_entry(self, date):
-        """Set date"""
-        self.date_button.configure(text=date)
+    def set_date_entry(self, data):
+        if 'start_date' in data:
+            self.date_button.configure(text=data['start_date'])
+            if 'start_time' in data:
+                self.date_button.configure(text=f"{data['start_date']}, {data['start_time']}")
 
-        self.cal_widget.destroy()
+        if 'end_date' in data:
+            self.date_button.configure(text=f"{data['start_date']}\n{data['end_date']}")
+            if 'end_time' in data:
+                self.date_button.configure(text=f"{data['start_date']}, {data['start_time']}\n{data['end_date']}, {data['end_time']} ")
 
 
 class AddTaskParameters(ctk.CTkToplevel):

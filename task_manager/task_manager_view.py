@@ -82,23 +82,23 @@ class TaskManagerTable(ctk.CTkFrame):
 
     def configure_treeview_style(self):
         style = ttk.Style()
-        style.configure("Treeview", font=('Helvetica', 10), foreground="black", background="lightblue", fieldbackground="lightblue")
+        style.configure("Treeview", font=('Helvetica', 10), foreground="black", background="lightblue", fieldbackground="lightblue", rowheight=50)
         style.configure("Treeview.Heading", background="blue", foreground="black")
 
     def configure_treeview_columns(self):
         self.task_list.column('#0', width=0, stretch=False)
         self.task_list.column('id', width=0, stretch=False)
         self.task_list.column('title', width=100)
-        self.task_list.column('description', width=200)
-        self.task_list.column('deadline', width=80)
+        self.task_list.column('description', width=150)
+        self.task_list.column('deadline', width=150)
         self.task_list.column('status', width=100)
-        self.task_list.column('priority', width=100)
-        self.task_list.column('tag', width=80)
+        self.task_list.column('priority', width=80)
+        self.task_list.column('tag', width=50)
 
     def configure_treeview_headings(self):
         self.task_list.heading('title', text='Zadanie')
         self.task_list.heading('description', text='Opis')
-        self.task_list.heading('deadline', text='Termin')
+        self.task_list.heading('deadline', text='Data')
         self.task_list.heading('status', text='Status')
         self.task_list.heading('priority', text='Priorytet')
         self.task_list.heading('tag', text='Tag')
@@ -171,7 +171,7 @@ class TaskManagerTiles(ctk.CTkFrame):
             parent = status_to_frame.get(item['status'], None)
             color = priority_to_color.get(item['priority'], None)
             if parent:  # Sprawdź, czy znaleziono odpowiednią ramkę
-                tile = TilesCreator(parent, self, item['title'], item['priority'], item['deadline'], color, item['id'])
+                tile = TilesCreator(parent, self, item['title'], item['priority'], color, item['id'])
                 self.tiles[item['id']] = tile
                 
     def new_task_tile(self, title, status, priority, deadline, id_task):
@@ -220,7 +220,7 @@ class TaskManagerTiles(ctk.CTkFrame):
         else: 
             frame.pack_forget()
             
-    def edit_tile(self, id_task, title, priority, due_to, status):
+    def edit_tile(self, id_task, title, priority, status):
         priority_to_color = {
             'Wysoki': HIGH_PRIORITY,
             'Średni': MEDIUM_PRIORITY,
@@ -245,7 +245,7 @@ class TaskManagerTiles(ctk.CTkFrame):
         tile.destroy()
         
         
-        tile = TilesCreator(parent,self,title, priority, due_to, color, id_task)
+        tile = TilesCreator(parent,self,title, priority, color, id_task)
         self.tiles[str(id_task)] = tile
     
     def delete_tile(self, id_task):
@@ -270,7 +270,7 @@ class TaskManagerTiles(ctk.CTkFrame):
         return self.selected_tile_id          
         
 class TilesCreator(ctk.CTkFrame):
-    def __init__(self, parent, task_manager_tiles, title_name, priority_name, due_to, color, id_task):
+    def __init__(self, parent, task_manager_tiles, title_name, priority_name, color, id_task):
         super().__init__(parent, fg_color=themes_manager.get_color('tile'))
         self.pack(side='bottom', fill='x', pady=5)
         
@@ -280,12 +280,11 @@ class TilesCreator(ctk.CTkFrame):
         self.columnconfigure((0,1), weight=1, uniform='a')
         self.rowconfigure(0, weight=2, uniform='a')
         self.rowconfigure(1, weight=1, uniform='a')
-        # self.grid_propagate(False)
         self.task_manager_tiles = task_manager_tiles
         self.id_task_tile = id_task
         
         
-        self.name_font = ctk.CTkFont(family="Abril Fatface", size=20, weight="bold")
+        self.name_font = ctk.CTkFont(family="Abril Fatface", size=15, weight="bold")
         
         
         
@@ -299,14 +298,10 @@ class TilesCreator(ctk.CTkFrame):
         self.priority_label = ctk.CTkLabel(self, text=priority_name, fg_color=color, corner_radius=5)
         self.priority_label.grid(column=0, row=1, sticky='nsew', padx=5, pady=2)
         
-        self.due_label = ctk.CTkLabel(self, text=due_to)
-        self.due_label.grid(column=1, row=1, sticky='nsew', padx=5,pady=2)
-
         self.priority_list = self.priority_label
 
         #binds
-        # self.bind("<Enter>", self.on_enter)
-        # self.bind("<Leave>", self.on_leave)
+       
         self.bind("<Double-1>", self.on_double_click)
         self.bind("<Button-3>", self.right_click)
         self.bind("<Button-1>", self.on_click)
@@ -318,10 +313,6 @@ class TilesCreator(ctk.CTkFrame):
         self.priority_label.bind("<Double-1>", self.on_double_click)
         self.priority_label.bind("<Button-3>", self.right_click)
         self.priority_label.bind("<Button-1>", self.on_click)
-        
-        self.due_label.bind("<Double-1>", self.on_double_click)
-        self.due_label.bind("<Button-3>", self.right_click)
-        self.due_label.bind("<Button-1>", self.on_click)
         
     def on_enter(self, event):
         self.configure(fg_color=themes_manager.get_color('tile_hover'))
