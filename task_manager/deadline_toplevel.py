@@ -22,7 +22,7 @@ class DeadlineWindow(ctk.CTkToplevel):
     
     def setup_window(self):
         x_pos = self.widget.winfo_rootx()
-        y_pos = self.widget.winfo_rooty()
+        y_pos = self.widget.winfo_rooty()-100
         self.geometry(f'300x500+{x_pos}+{y_pos}')
         self.lift(self.parent)
         self.transient(self.parent)
