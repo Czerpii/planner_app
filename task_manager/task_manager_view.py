@@ -3,10 +3,12 @@ import customtkinter as ctk
 from tkinter import ttk
 from PIL import Image
 import csv
-from task_manager.AddNewTask import NewTaskWindow
+from task_manager.task_window import TaskWindow
 from ICommand import Delete
 from invoker import Invoker
-from task_manager.EditCurrentTask import *
+from task_manager.task_manager_reciver import TaskManager
+from UserSingleton import *
+import themes_manager
     
 ###colors### 
 #tiles
@@ -21,14 +23,9 @@ LOW_PRIORITY = '#8d9214'
      
 class TaskManagerMain(ctk.CTkFrame):
     def __init__(self, parent, col, row,):
-        super().__init__(parent, fg_color="transparent", corner_radius=0, border_width=0)
+        super().__init__(parent, fg_color='transparent', corner_radius=0, border_width=0)
         self.grid(column = col, row=row, sticky = "nsew")
 
-        # singleton = UserSingleton()
-        # self.pathname = singleton.folder_path
-        # self.tasks_file = os.path.join(self.pathname, "tasks.csv")
-        # self.status_file = os.path.join(self.pathname, "status.csv" )
-        
         self.initialize_variables()
         self.configure_layout()
         self.initialize_widgets()
@@ -64,8 +61,8 @@ class TaskManagerMain(ctk.CTkFrame):
     
 class TaskManagerTable(ctk.CTkFrame):
     def __init__(self, parent, col, row, main_task_manager_instance):
-        super().__init__(parent, fg_color="transparent")
-        self.grid(column=col, row=row, sticky="nsew")
+        super().__init__(parent, fg_color="transparent", corner_radius=10)
+        self.grid(column=col, row=row, sticky="nsew", padx=5, pady=5)
         
         self.initialize_variables(main_task_manager_instance)
         self.create_treeview()
@@ -128,7 +125,7 @@ class TaskManagerTable(ctk.CTkFrame):
             values = self.task_list.item(selected_item_id, "values")
             keys = self.task_list["columns"]
             selected_dictionary = dict(zip(keys, values))
-            EditTaskWindow(self, self, self.task_manager_main.task_manager_tiles, selected_dictionary, selected_item_id)
+            TaskWindow(self, self, self.task_manager_main.task_manager_tiles, selected_dictionary, selected_item_id).setup_ui_elements_for_existed_task()
             
     def edit_chosen_task(self, item_id, **values):
         values_list = list(values.values())
@@ -140,7 +137,7 @@ class TaskManagerTable(ctk.CTkFrame):
 class TaskManagerTiles(ctk.CTkFrame):
     
     def __init__(self, parent, col, row, task_manager_main):
-        super().__init__(parent, fg_color='#004B23')
+        super().__init__(parent, fg_color='transparent')
         self.grid(column = col, row=row, sticky='nsew')
     
         #instances
@@ -200,26 +197,21 @@ class TaskManagerTiles(ctk.CTkFrame):
         tile = TilesCreator(parent,self,title, priority, deadline, color, id_task)
         self.tiles[str(id_task)] = tile
              
+    def create_scrollable_frame(self, text):
+        frame = ctk.CTkScrollableFrame(self,
+                                       fg_color=themes_manager.get_color('task_frame'),
+                                       scrollbar_button_color=themes_manager.get_color('scrollbar'),
+                                       scrollbar_button_hover_color=themes_manager.get_color('scrollbar_hover'))
+        ctk.CTkLabel(frame, text=text).pack()
+        frame.pack(side='left', expand='true', fill="both", padx=3)
+        return frame
+
     def create_status_frame(self):
-        self.status_frame_not_started = ctk.CTkScrollableFrame(self, fg_color=FRAME_TILES)
-        ctk.CTkLabel(self.status_frame_not_started, text="Nie rozpoczęte").pack()
-        self.status_frame_not_started.pack(side='left', expand ='true', fill="both", padx=3)
-        
-        
-        self.status_frame_in_progress = ctk.CTkScrollableFrame(self, fg_color=FRAME_TILES)
-        ctk.CTkLabel(self.status_frame_in_progress, text="W trakcie").pack()
-        self.status_frame_in_progress.pack(side='left', expand ='true', fill="both", padx=3)
-        
-        
-        self.status_frame_end = ctk.CTkScrollableFrame(self, fg_color=FRAME_TILES)
-        ctk.CTkLabel(self.status_frame_end, text="Zakończone").pack()
-        self.status_frame_end.pack(side='left', expand ='true', fill="both", padx=3)
-        
-        
-        self.status_frame_archived = ctk.CTkScrollableFrame(self, fg_color=FRAME_TILES)
-        ctk.CTkLabel(self.status_frame_archived, text="Zarchiwizowane").pack()
-        self.status_frame_archived.pack(side='left', expand ='true', fill="both", padx=3)
-       
+        self.status_frame_not_started = self.create_scrollable_frame("Nie rozpoczęte")
+        self.status_frame_in_progress = self.create_scrollable_frame("W trakcie")
+        self.status_frame_end = self.create_scrollable_frame("Zakończone")
+        self.status_frame_archived = self.create_scrollable_frame("Zarchiwizowane")
+      
     def create_frame(self, frame, status): #ukrywania i pokazywanie ramki z statusami za pomocą checkboxa
         status = status.get()
         frame = frame
@@ -268,18 +260,18 @@ class TaskManagerTiles(ctk.CTkFrame):
             if row['id'] == str(id_task):
                 selected_task = row     
         
-        EditTaskWindow(self,
+        TaskWindow(self,
                        self.task_manager_main.task_manager_table,
                        self,
                        selected_task,
-                       id_task)
+                       id_task).setup_ui_elements_for_existed_task()
     
     def on_select(self):
         return self.selected_tile_id          
         
 class TilesCreator(ctk.CTkFrame):
     def __init__(self, parent, task_manager_tiles, title_name, priority_name, due_to, color, id_task):
-        super().__init__(parent, fg_color=TILES)
+        super().__init__(parent, fg_color=themes_manager.get_color('tile'))
         self.pack(side='bottom', fill='x', pady=5)
         
         self.update_idletasks()
@@ -332,14 +324,14 @@ class TilesCreator(ctk.CTkFrame):
         self.due_label.bind("<Button-1>", self.on_click)
         
     def on_enter(self, event):
-        self.configure(fg_color=TILES_HOVER)
+        self.configure(fg_color=themes_manager.get_color('tile_hover'))
     
     def on_leave(self, event):
-        self.configure(fg_color=TILES)
+        self.configure(fg_color=themes_manager.get_color('tile'))
        
     def on_double_click(self, event):
         self.task_manager_tiles.open_editor(self.id_task_tile)
-        self.configure(fg_color=TILES)
+        self.configure(fg_color=themes_manager.get_color('tile'))
         self.task_manager_tiles.selected_tile_id=None
     
     def right_click(self, event):
@@ -350,14 +342,14 @@ class TilesCreator(ctk.CTkFrame):
         if self.task_manager_tiles.selected_tile_id is not None:
             previous_tile = self.task_manager_tiles.tiles.get(str(self.task_manager_tiles.selected_tile_id))
             if previous_tile:
-                previous_tile.configure(fg_color=TILES)  # Zmiana koloru na domyślny
+                previous_tile.configure(fg_color=themes_manager.get_color('tile'))  # Zmiana koloru na domyślny
         # Zaznacz nowy kafelek
-        self.configure(fg_color=TILES_HOVER)  # Zmiana koloru na kolor zaznaczenia
+        self.configure(fg_color=themes_manager.get_color('tile_hover'))  # Zmiana koloru na kolor zaznaczenia
         self.task_manager_tiles.selected_tile_id = self.id_task_tile  # Zapamiętanie ID zaznaczonego kafelka
 
 class TaskManagerButtonBar(ctk.CTkFrame):
     def __init__(self, parent, col, row, task_manager_table, task_manager_main, task_manager_tiles):
-        super().__init__(parent, fg_color="#004B23", corner_radius=0, border_width=0)
+        super().__init__(parent, fg_color="transparent", corner_radius=0, border_width=0)
         self.grid(column = col, row=row, sticky = "nsew")
         
         #instances
@@ -399,8 +391,9 @@ class TaskManagerButtonBar(ctk.CTkFrame):
                       text = text,
                       command=command,
                       image=image,
-                      fg_color="#006400",
-                      hover_color="#008000"
+                      fg_color=themes_manager.get_color('button'),
+                      hover_color=themes_manager.get_color('button_hover'),
+                      text_color='black'
                       )
         button.grid(row = row, 
                     column=column, 
@@ -413,7 +406,7 @@ class TaskManagerButtonBar(ctk.CTkFrame):
     #obsługa przycisków           
     def open_new_task_window(self):
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            self.toplevel_window = NewTaskWindow(self.parent, self.task_manager_table, self.task_manager_tiles)
+            self.toplevel_window = TaskWindow(self.parent, self.task_manager_table, self.task_manager_tiles).setup_ui_elements_for_new_task()
         else:
             self.toplevel_window.focus()
         

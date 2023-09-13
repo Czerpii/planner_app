@@ -5,8 +5,8 @@ import random
 
 import customtkinter as ctk
 
-from task_manager.CalendarWidget import CalendarDateEntry
-from ICommand import Save
+from task_manager.calendar_widget import CalendarDateEntry
+from ICommand import Save, Edit
 from invoker import Invoker
 from task_manager.task_manager_reciver import *
 
@@ -33,11 +33,43 @@ BUTTON_HOVER = "#3A3A3A"
 DESC_FG = "#282828"
 
 
-class NewTaskWindow(ctk.CTkToplevel):
-    def __init__(self, parent, task_manager_table_instance, task_manager_tiles_instance):
+class TaskWindow(ctk.CTkToplevel):
+    """
+    A window class that provides an interface for creating and editing tasks
+    """
+    def __init__(self, parent, task_manager_table_instance, task_manager_tiles_instance, task_data=None, selected_item_id=None):
+        """Initialez the TaskWindow
+
+        Args:
+            parent: Parent window
+            task_manager_table_instance: Instance of the task manager table
+            task_manager_tiles_instance: Instance of the task manager tiles
+            task_data: Data related to a task. Defaults to None. Provide to edit task
+            selected_item_id: ID od the selected task. Defaults to None. Provide to edit task
+        """
         super().__init__(parent, fg_color=TOP_LEVEL_FG)
-        # centrowanie okna
+        
+        
         self.cal_widget = None
+        self.parent = parent
+        self.button_mode = None
+        self.task_data=task_data
+        self.selected_item_id=selected_item_id
+
+        self.invoker = Invoker()
+        self.task_manager_table_instance = task_manager_table_instance
+        self.task_manager_tiles_instance = task_manager_tiles_instance
+        self.add_task = AddTaskParameters
+
+        self.name_font = ctk.CTkFont(family="Abril Fatface", size=30, weight="bold")
+
+        self.setup_window()
+        self.configure_layout()
+        self.setup_labels()
+        self.create_action_buttons(col=0, row=6)
+       
+    def setup_window(self):
+        """Configures the initial window settings, size and position"""
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         center_x = int(screen_width / 2 - 300 / 2)
@@ -46,100 +78,18 @@ class NewTaskWindow(ctk.CTkToplevel):
         self.maxsize(300, 400)
         self.minsize(300, 400)
 
-        self.lift(parent)
-        self.transient(parent)
-        self.title("Nowe zadanie")
-
-        self.invoker = Invoker()
-        self.task_manager_table_instance = task_manager_table_instance
-        self.task_manager_tiles_instance = task_manager_tiles_instance
-        self.add_task = AddTaskParameters
-
-        # layout
+        self.lift(self.parent)
+        self.transient(self.parent)
+            
+    def configure_layout(self):
+        """Configures the grid layout of the window"""
         self.columnconfigure(0, weight=1, uniform="a")
         self.columnconfigure(1, weight=2, uniform='a')
         self.rowconfigure(0, weight=1, uniform='a')
-        self.rowconfigure((1, 2, 3, 4, 5, 6), weight=1, uniform='a')
-
-        # fonts
-        self.name_font = ctk.CTkFont(family="Abril Fatface", size=30, weight="bold")
-
-        # task title
-        self.title_entry = ctk.CTkEntry(self,
-                                        placeholder_text="Nazwa",
-                                        font=self.name_font,
-                                        corner_radius=5,
-                                        fg_color=ENTRY_FG,
-                                        border_width=0
-                                        )
-        self.title_entry.grid(row=0, column=0, columnspan=2, sticky='nsew', pady=2)
-
-        # description textbox
-        self.create_labels(col=0, row=1, text="Opis zadania")
-
-        self.desc_textbox = ctk.CTkTextbox(self, fg_color=DESC_FG, corner_radius=5)
-        self.desc_textbox.grid(column=1, row=1, sticky="nsew", pady=2, padx=2)
-
-        # deadline entry
-        self.create_labels(col=0, row=3, text='Termin')
-
-        self.date_button = ctk.CTkButton(self,
-                                         text="Bezterminowo",
-                                         command=self.open_calendar_button_click,
-                                         fg_color=BUTTON_FG,
-                                         hover_color=BUTTON_HOVER,
-                                         corner_radius=5)
-        self.date_button.grid(column=1, row=3, sticky='nsew', pady=2, padx=2)
-
-        # status
-        self.create_labels(col=0, row=2, text="Status")
-        self.status_list = ctk.CTkButton(self,
-                                         text='Nie rozpoczęto',
-                                         command=self.status_list_button_click,
-                                         fg_color=BUTTON_FG,
-                                         hover_color=BUTTON_HOVER,
-                                         corner_radius=5)
-        self.status_list.grid(column=1, row=2, sticky="nsew", pady=2, padx=2)
-
-        # priority list
-        self.create_labels(col=0, row=4, text="Priotytet")
-        self.priority_list = ctk.CTkButton(self,
-                                           text='Wybierz',
-                                           command=self.priority_list_button_click,
-                                           fg_color=BUTTON_FG,
-                                           hover_color=BUTTON_HOVER,
-                                           corner_radius=5)
-        self.priority_list.grid(column=1, row=4, sticky="nsew", pady=2, padx=2)
-
-        # tag list
-        self.create_labels(col=0, row=5, text="Tag")
-        self.tag_list = ctk.CTkButton(self,
-                                      text='Wybierz',
-                                      command=self.tag_list_button_click,
-                                      fg_color=BUTTON_FG,
-                                      hover_color=BUTTON_HOVER)
-        self.tag_list.grid(column=1, row=5, sticky="nsew", pady=2, padx=2)
-
-        # buttons - save and cancel
-        self.buttons_frame = ctk.CTkFrame(self, border_width=0, fg_color=FRAME_FG)
-        self.buttons_frame.grid(column=0, row=6, columnspan=2, sticky='nsew')
-
-        self.save_button = ctk.CTkButton(self.buttons_frame,
-                                         text="Zapisz",
-                                         command=self.save_task_button_click,
-                                         fg_color=BUTTON_FG,
-                                         hover_color=BUTTON_HOVER,
-                                         corner_radius=5)
-        self.save_button.pack(side='left', padx=4, fill='x', expand='true')
-        self.cancel_button = ctk.CTkButton(self.buttons_frame,
-                                           text="Anuluj",
-                                           command=lambda: self.destroy(),
-                                           fg_color=BUTTON_FG,
-                                           hover_color=BUTTON_HOVER,
-                                           corner_radius=5)
-        self.cancel_button.pack(side='left', padx=4, fill='x', expand='true')
+        self.rowconfigure((1, 2, 3, 4, 5, 6), weight=1, uniform='a') 
 
     def create_labels(self, col, row, text):
+        """Create label and place on the windows"""
         ctk.CTkLabel(self,
                      text=text,
                      anchor='center',
@@ -148,16 +98,140 @@ class NewTaskWindow(ctk.CTkToplevel):
                      text_color=LABEL_TEXT,
                      ).grid(column=col, row=row, sticky='nsew', pady=2, padx=2)
 
+    def create_title_entry(self, col, row):
+        """Creates the title entry widget."""
+        self.title_entry = ctk.CTkEntry(self,
+                                        placeholder_text="Nazwa",
+                                        font=self.name_font,
+                                        corner_radius=5,
+                                        fg_color=ENTRY_FG,
+                                        border_width=0
+                                        )
+        self.title_entry.grid(row=0, column=0, columnspan=2, sticky='nsew', pady=2)
+        
+    def create_description_entry(self, col, row):
+        """Creates the description textbox widget."""
+        self.desc_textbox = ctk.CTkTextbox(self, fg_color=DESC_FG, corner_radius=5)
+        self.desc_textbox.grid(column=col, row=row, sticky="nsew", pady=2, padx=2)
+    
+    def create_status_button(self, col, row, text="Nie rozpoczęto"):
+        """Creates the status selection button widget."""
+        self.status_list = ctk.CTkButton(self,
+                                         text=text,
+                                         command=self.status_list_button_click,
+                                         fg_color=BUTTON_FG,
+                                         hover_color=BUTTON_HOVER,
+                                         corner_radius=5)
+        self.status_list.grid(column=col, row=row, sticky="nsew", pady=2, padx=2)
+    
+    def create_date_button(self, col, row, text="Bezterminowo"):
+        """Creates the date selection button widget."""
+        self.date_button = ctk.CTkButton(self,
+                                         text=text,
+                                         command=self.open_calendar_button_click,
+                                         fg_color=BUTTON_FG,
+                                         hover_color=BUTTON_HOVER,
+                                         corner_radius=5)
+        self.date_button.grid(column=col, row=row, sticky='nsew', pady=2, padx=2)
+    
+    def create_priority_button(self, col, row, text="Wybierz"):
+        """Creates the priority selection button widget."""
+        self.priority_list = ctk.CTkButton(self,
+                                           text=text,
+                                           command=self.priority_list_button_click,
+                                           fg_color=BUTTON_FG,
+                                           hover_color=BUTTON_HOVER,
+                                           corner_radius=5)
+        self.priority_list.grid(column=col, row=row, sticky="nsew", pady=2, padx=2)
+     
+    def create_tag_button(self, col, row, text="Wybierz"):
+        """Creates the tag selection button widget."""
+        self.tag_list = ctk.CTkButton(self,
+                                      text=text,
+                                      command=self.tag_list_button_click,
+                                      fg_color=BUTTON_FG,
+                                      hover_color=BUTTON_HOVER)
+        self.tag_list.grid(column=col, row=row, sticky="nsew", pady=2, padx=2)
+    
+    def setup_labels(self):
+        """Sets up labels for different fields on the window."""
+        self.create_labels(col=0, row=1, text="Opis zadania")
+        self.create_labels(col=0, row=3, text='Termin')
+        self.create_labels(col=0, row=2, text="Status")
+        self.create_labels(col=0, row=4, text="Priotytet")
+        self.create_labels(col=0, row=5, text="Tag")
+     
+    def setup_ui_elements_for_new_task(self):
+        """Configures the UI elements when creating a new task."""
+        self.create_title_entry(col=0, row=0)
+        self.create_description_entry(col=1, row=1)
+        self.create_status_button(col=1, row=2)
+        self.create_date_button(col=1, row=3)
+        self.create_priority_button(col=1, row=4)
+        self.create_tag_button(col=1, row=5)
+        
+        self.button_mode = 'new'
+        self.title("Nowe zadanie")
+    
+    def setup_ui_elements_for_existed_task(self):
+        """Configures the UI elements when editing an existing task."""
+        self.create_title_entry(col=0, row=0)
+        self.title_entry.insert(0, self.task_data['title'])
+        
+        self.create_description_entry(col=1, row=1)
+        self.desc_textbox.delete("1.0", "end")
+        self.desc_textbox.insert("end", self.task_data['description'])
+        
+        self.create_status_button(col=1, row=2, text=self.task_data['status'])
+        self.create_date_button(col=1, row=3, text=self.task_data['deadline'])
+        self.create_priority_button(col=1, row=4, text=self.task_data['priority'])
+        self.create_tag_button(col=1, row=5, text=self.task_data['tag'])
+        
+        self.button_mode='edit'
+        self.title("Edytuj zadanie")
+        
+    def create_action_buttons(self, col, row):
+        """Creates the save and cancel action buttons."""
+        buttons_frame = ctk.CTkFrame(self, border_width=0, fg_color=FRAME_FG)
+        buttons_frame.grid(column=col, row=row, columnspan=2, sticky='nsew')
+
+        self.save_button = ctk.CTkButton(buttons_frame,
+                                         text="Zapisz",
+                                         command=self.save_task_button_click,
+                                         fg_color=BUTTON_FG,
+                                         hover_color=BUTTON_HOVER,
+                                         corner_radius=5)
+        self.save_button.pack(side='left', padx=4, fill='x', expand='true')
+        self.cancel_button = ctk.CTkButton(buttons_frame,
+                                           text="Anuluj",
+                                           command=lambda: self.destroy(),
+                                           fg_color=BUTTON_FG,
+                                           hover_color=BUTTON_HOVER,
+                                           corner_radius=5)
+        self.cancel_button.pack(side='left', padx=4, fill='x', expand='true')
+    
     def tag_list_button_click(self):
+        """Open tag list window"""
         AddTaskParameters(parent=self, data_name="tag", new_task_window_instance=self)
 
     def status_list_button_click(self):
+        """Open status list window"""
         AddTaskParameters(parent=self, data_name="status", new_task_window_instance=self)
 
     def priority_list_button_click(self):
+        """Open priority list window"""
         AddTaskParameters(parent=self, data_name="priority", new_task_window_instance=self)
 
     def save_task_button_click(self):
+        """Sets the action of the save button and triggers it"""
+        if self.button_mode == 'new':
+            self.new_task()
+        
+        elif self.button_mode == 'edit':
+            self.edit_task()
+    
+    def new_task(self):
+        """Save new task"""
         params = {
             'id': random.randint(1,10000),
             'title': self.title_entry.get(),
@@ -179,8 +253,30 @@ class NewTaskWindow(ctk.CTkToplevel):
                                                         id_task = params['id']
                                                         )
         self.destroy()
+        
+    def edit_task(self):
+        """Edit the given task"""
+        params = {
+            'id': self.task_data['id'],
+            'title': self.title_entry.get(),
+            'description': self.desc_textbox.get(index1="0.0", index2="end"),
+            'deadline': self.date_button.cget("text"),
+            'status': self.status_list.cget("text"),
+            'priority': self.priority_list.cget("text"),
+            'tag': self.tag_list.cget("text")
+        }
+
+        task = TaskManager()
+        edit_task_command = Edit(task, **params)
+        self.invoker.set_command(edit_task_command)
+        self.invoker.press_button()
+        self.task_manager_table_instance.edit_chosen_task(self.selected_item_id, **params)
+        self.task_manager_tiles_instance.edit_tile(self.selected_item_id, params['title'], params['priority'], params['deadline'], params['status'])
+        
+        self.destroy()
 
     def open_calendar_button_click(self):
+        """Open calendar widget"""
         x_pos = self.date_button.winfo_rootx()
         y_pos = self.date_button.winfo_rooty()
 
@@ -193,6 +289,7 @@ class NewTaskWindow(ctk.CTkToplevel):
         cal = CalendarDateEntry(self.cal_widget, on_date_select=self.set_date_entry)
 
     def set_date_entry(self, date):
+        """Set date"""
         self.date_button.configure(text=date)
 
         self.cal_widget.destroy()
@@ -298,8 +395,6 @@ class AddTaskParameters(ctk.CTkToplevel):
         self.widget.configure(text=button_text)
         self.destroy()
        
-       
-
     def button_delete_clicked(self, parameters, index):
         parameters.destroy()
 
