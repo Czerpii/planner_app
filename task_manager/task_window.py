@@ -147,9 +147,7 @@ class TaskWindow(ctk.CTkToplevel):
                                          hover_color=BUTTON_HOVER,
                                          corner_radius=5)
         self.end_button.grid(column=0, row=1, sticky='nsew')
-        
-        
-    
+              
     def create_priority_button(self, col, row, text="Wybierz"):
         """Creates the priority selection button widget."""
         self.priority_list = ctk.CTkButton(self,
@@ -196,7 +194,7 @@ class TaskWindow(ctk.CTkToplevel):
         
         self.create_description_entry(col=1, row=1)
         self.desc_textbox.delete("0.0", "end")
-        self.desc_textbox.insert("end", self.task_data['description'])
+        self.desc_textbox.insert("0.0", self.task_data['description'])
         
         self.create_status_button(col=1, row=2, text=self.task_data['status'])
         self.create_deadline_buttons(col=1, row=3, text_start=self.task_data['start'], text_end=self.task_data['end'])

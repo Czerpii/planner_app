@@ -22,7 +22,7 @@ class Save(Command):
         self.to_save = input
         
     def execute(self):
-        self.reciver.save_task(self.to_save)
+        self.reciver.save(self.to_save)
     
 
 class Delete(Command):
@@ -32,7 +32,7 @@ class Delete(Command):
         self.to_delete = input
     
     def execute(self):
-        self.reciver.delete_task(self.to_delete)
+        self.reciver.delete(self.to_delete)
         
         
 class Edit(Command):
@@ -42,4 +42,4 @@ class Edit(Command):
         self.to_edit = input
     
     def execute(self):
-        self.reciver.edit_task(self.to_edit)
+        self.reciver.edit(self.to_edit)

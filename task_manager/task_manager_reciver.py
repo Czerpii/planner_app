@@ -76,7 +76,7 @@ class TaskManager():
                 status.append(row) 
         return status
     
-    def save_task(self, task_information):
+    def save(self, task_information):
         self.decrypt_file(self.tasks_file_encrypted)
         with open(self.temp_file, 'a', encoding='utf-8') as file:
             writer = csv.DictWriter(file, fieldnames=self.headers)
@@ -85,7 +85,7 @@ class TaskManager():
         os.remove(self.temp_file)  
             
         
-    def delete_task(self, task_id):
+    def delete(self, task_id):
         self.decrypt_file(self.tasks_file_encrypted)
 
         # Czytaj wszystkie wiersze z pliku CSV
@@ -109,7 +109,7 @@ class TaskManager():
             
 
     
-    def edit_task(self, choosen_task):
+    def edit(self, choosen_task):
         self.decrypt_file(self.tasks_file_encrypted)
         updated_row = choosen_task
         with open(self.temp_file, 'r', encoding='utf-8') as file:
