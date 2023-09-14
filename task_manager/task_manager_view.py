@@ -75,7 +75,7 @@ class TaskManagerTable(ctk.CTkFrame):
 
     def create_treeview(self):
         self.configure_treeview_style()
-        self.task_list = ttk.Treeview(self, columns=('id', 'title', 'description', 'deadline', 'status', 'priority', 'tag'))
+        self.task_list = ttk.Treeview(self, columns=('id', 'title', 'description', 'start', 'end', 'status', 'priority', 'tag'))
         self.configure_treeview_columns()
         self.configure_treeview_headings()
         self.task_list.pack(side='left', expand='true', fill='both')
@@ -90,7 +90,8 @@ class TaskManagerTable(ctk.CTkFrame):
         self.task_list.column('id', width=0, stretch=False)
         self.task_list.column('title', width=100)
         self.task_list.column('description', width=150)
-        self.task_list.column('deadline', width=150)
+        self.task_list.column('start', width=100)
+        self.task_list.column('end', width=100)
         self.task_list.column('status', width=100)
         self.task_list.column('priority', width=80)
         self.task_list.column('tag', width=50)
@@ -98,7 +99,8 @@ class TaskManagerTable(ctk.CTkFrame):
     def configure_treeview_headings(self):
         self.task_list.heading('title', text='Zadanie')
         self.task_list.heading('description', text='Opis')
-        self.task_list.heading('deadline', text='Data')
+        self.task_list.heading('start', text='Rozpoczęcie')
+        self.task_list.heading('end', text = 'Zakończenie')
         self.task_list.heading('status', text='Status')
         self.task_list.heading('priority', text='Priorytet')
         self.task_list.heading('tag', text='Tag')
@@ -134,6 +136,7 @@ class TaskManagerTable(ctk.CTkFrame):
     def on_select(self):
         return self.task_list.selection()[0]
  
+        
 class TaskManagerTiles(ctk.CTkFrame):
     
     def __init__(self, parent, col, row, task_manager_main):
@@ -174,7 +177,7 @@ class TaskManagerTiles(ctk.CTkFrame):
                 tile = TilesCreator(parent, self, item['title'], item['priority'], color, item['id'])
                 self.tiles[item['id']] = tile
                 
-    def new_task_tile(self, title, status, priority, deadline, id_task):
+    def new_task_tile(self, title, status, priority, id_task):
         status_to_frame = {
             'Nie rozpoczęto': self.status_frame_not_started,
             'W trakcie': self.status_frame_in_progress,
@@ -194,7 +197,7 @@ class TaskManagerTiles(ctk.CTkFrame):
         except:
             color = None
         
-        tile = TilesCreator(parent,self,title, priority, deadline, color, id_task)
+        tile = TilesCreator(parent,self,title, priority, color, id_task)
         self.tiles[str(id_task)] = tile
              
     def create_scrollable_frame(self, text):

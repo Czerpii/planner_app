@@ -126,14 +126,14 @@ class DeadlineWindow(ctk.CTkToplevel):
         self.start_time = ctk.CTkEntry(self.info_frame,textvariable=self.start_time_var)
         self.start_time.grid(column=col, row=row, sticky='nsew', padx=10)
         
-        self.start_time_var.trace_add('write', lambda *args: self.on_time_change('start_time', *args))
+        self.start_time_var.trace_add('write', lambda *args: self.time_mask('start_time', *args))
         self.start_time.bind('<FocusIn>', self.set_cursor_at_start)
     
     def create_end_time_widget(self, col, row):
         self.end_time = ctk.CTkEntry(self.info_frame, textvariable=self.end_time_var)
         self.end_time.grid(column=col, row=row, sticky='nsew', padx=10)
         
-        self.end_time_var.trace_add('write', lambda *args: self.on_time_change('end_time', *args))
+        self.end_time_var.trace_add('write', lambda *args: self.time_mask('end_time', *args))
         self.end_time.bind('<FocusIn>', self.set_cursor_at_start)
     
     def create_date_switch(self):
@@ -161,12 +161,12 @@ class DeadlineWindow(ctk.CTkToplevel):
         ok_button = ctk.CTkButton(action_buttons_frame, text='Ok', command=self.ok_button_click)
         ok_button.pack(side='left', padx=2)
     
-        cancel_button = ctk.CTkButton(action_buttons_frame, text='Anuluj')
+        cancel_button = ctk.CTkButton(action_buttons_frame, text='Anuluj', command=self.cancel_button_click)
         cancel_button.pack(side='left', padx=2)
     #Class logic
-    def on_time_change(self, time_var_name, *args):
-        time_var = getattr(self, time_var_name + "_var")
-        time_widget = getattr(self, time_var_name)
+    def time_mask(self, time_name, *args):
+        time_var = getattr(self, time_name + "_var")
+        time_widget = getattr(self, time_name)
         
         value = time_var.get()
         cursor_position = time_widget.index(ctk.INSERT)
@@ -174,6 +174,7 @@ class DeadlineWindow(ctk.CTkToplevel):
 
         # jeżeli wprowadzono zbyt wiele znaków
         if len(clean_value) > 4:
+            time_widget.configure(border_color = 'red')
             clean_value = clean_value[:4]
 
         # Obsługa wprowadzenia godzin
@@ -193,10 +194,12 @@ class DeadlineWindow(ctk.CTkToplevel):
         # Dodawanie zer do wartości, jeżeli jest to konieczne
         if len(clean_value) == 1:
             if int(clean_value) > 2:
+                
                 clean_value = "0" + clean_value
 
         if len(clean_value) == 3:
             if int(clean_value[2:]) > 5:
+                
                 clean_value = clean_value[:2] + "0" + clean_value[2]
 
         # Ustalanie wartości z maską
@@ -204,6 +207,7 @@ class DeadlineWindow(ctk.CTkToplevel):
         if len(masked_value) > 2:
             masked_value = masked_value[:2] + ':' + masked_value[2:]
         time_var.set(masked_value)
+        
 
     def format_date(self, date_obj):
         days_of_week = ["Pn", "Wt", "Śr", "Cz", "Pt", "So", "Nd"]
@@ -294,7 +298,10 @@ class DeadlineWindow(ctk.CTkToplevel):
 
         self.return_data()
         self.destroy()
-            
+    
+    def cancel_button_click(self):
+        self.destroy()
+         
     def return_data(self):
         self.callback(self.callback_data)
  

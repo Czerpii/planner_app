@@ -16,7 +16,7 @@ class TaskManager():
         self.status_file = os.path.join(self.pathname, 'status.csv')
         self.tag_file = os.path.join(self.pathname, "tag.csv")
         
-        self.headers = ["id", "title", "description", "deadline", "status", "priority", "tag"]
+        self.headers = ["id", "title", "description", "start", "end", "status", "priority", "tag"]
         
         #create task file
         if not os.path.exists(self.tasks_file_encrypted):
