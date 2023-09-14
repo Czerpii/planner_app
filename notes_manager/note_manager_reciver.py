@@ -34,6 +34,7 @@ class NoteManager():
             reader = csv.DictReader(file)
             data = list(reader)
         os.remove(self.temp_file)
+        data=reversed(data)
         return data
            
     def save(self, note_content):
@@ -66,7 +67,27 @@ class NoteManager():
             os.remove(self.note_file_encrypted)
         self.encrypt_file(self.temp_file)
         os.remove(self.temp_file) 
-            
+    
+    def edit(self, choosen_task):
+        self.decrypt_file(self.note_file_encrypted)
+        updated_id = choosen_task['id']
+
+        with open(self.temp_file, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            rows = list(reader)
+
+        for index, data in enumerate(rows):
+            if data['id'] == updated_id:
+                rows[index] = choosen_task
+                break
+
+        with open(self.temp_file, 'w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=self.headers)
+            writer.writeheader()
+            writer.writerows(rows)
+
+        self.encrypt_file(self.temp_file)
+        os.remove(self.temp_file)      
         
     
     def encrypt_file(self, file_path):
