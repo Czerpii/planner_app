@@ -2,8 +2,10 @@
 import customtkinter as ctk
 from PIL import Image
 import os
+import random
 from notes_manager.note_manager_reciver import *
-
+from ICommand import *
+from invoker import *
 
 NOTE_BG = "#212529"
 NOTE_BORDER = "#343A40"
@@ -19,10 +21,11 @@ class NoteManagerMain(ctk.CTkFrame):
         
         self.color_palette = self.import_ico_images("color_palette.png")
         
-        self.note_bar = NoteManagerNoteBar(self, 0,0)
+       
         self.note_tiles = NoteManagerNotesTiles(self,0,1)
+        self.note_bar = NoteManagerNoteBar(self, 0,0, self.note_tiles)
         self.note_manager = NoteManager()
-        
+        self.invoker = Invoker()
     
         self.bind("<Button-1>", self.note_bar.off_focus)
     
@@ -81,19 +84,31 @@ class NoteManagerMain(ctk.CTkFrame):
         if not (x <= mouse_x <= x + width and y <= mouse_y <= y + height):
             # Jeżeli kursor myszy jest poza oknem, zniszcz okno
             widget.destroy()
-        
-        
-                  
+    
+    def save_note(self, **params):
+        reciver = self.note_manager
+        save_note_command = Save(reciver, **params)
+        self.invoker.set_command(save_note_command)
+        self.invoker.press_button()
+    
+    def delete_note(self, id_note):
+        reciver = self.note_manager
+        delete_note_command = Delete(reciver, id_note)
+        self.invoker.set_command(delete_note_command)
+        self.invoker.press_button()
+                        
 class NoteManagerNoteBar(ctk.CTkFrame):
-    def __init__(self, parent, col, row):
+    def __init__(self, parent, col, row, tiles_note_manager_instance):
         super().__init__(parent, fg_color="transparent", corner_radius=5)
         self.grid(column= col, row=row, sticky='nsew')
         
         self.note_main = parent
+        self.note_tiles_manager = tiles_note_manager_instance
         
         self.create_default_frame()
         self.create_expanded_note_frame()
         self.expanded_frame.pack_forget()
+        
         
         self.bind("<Button-1>", self.off_focus) 
           
@@ -173,7 +188,7 @@ class NoteManagerNoteBar(ctk.CTkFrame):
                                           fg_color='transparent',
                                           hover=False,
                                           image=self.note_main.import_ico_images("tick.png"),
-                                          command=None)
+                                          command=self.save_button_click)
         self.confirm_button.pack_propagate(False)
         self.confirm_button.pack(side='right', padx=2, pady=2)
           
@@ -201,103 +216,159 @@ class NoteManagerNoteBar(ctk.CTkFrame):
         self.entry_title.configure(placeholder_text = 'Tytuł')
         self.entry_description.delete(0.0, 'end')
         self.expanded_frame.pack_forget()
+        self.expanded_frame.configure(fg_color = NOTE_FG)
         self.default_frame.pack(pady=15)
 
+    def save_button_click(self):
+        params = {
+            'id': random.randint(1,10000),
+            'title': self.entry_title.get(),
+            'description': self.entry_description.get(index1='0.0', index2='end'),
+            'background_color': self.expanded_frame.cget('fg_color')
+        }
+        self.note_main.save_note(**params)
+        self.note_tiles_manager.add_new_note(title = params['title'],
+                                             description = params['description'],
+                                             background_color = params['background_color'],
+                                             id_note = params['id'])
+            
+
 class NoteManagerNotesTiles(ctk.CTkScrollableFrame):
-    def __init__(self, parent, col, row ):
+    """
+    A class to manage and display notes in a grid layout.
+
+    Attributes:
+    ----------
+    note_main : parent instance
+        The main instance of the note manager.
+    tiles : dict
+        Dictionary to store note tiles by their IDs.
+    row : int
+        Current row position for the next tile.
+    column : int
+        Current column position for the next tile.
+    """
+
+    def __init__(self, parent, col, row):
+        """Initialize the NoteManagerNotesTiles."""
         super().__init__(parent, fg_color="transparent")
         self.grid(column=col, row=row, sticky='nsew')
         
-        self.main_instance = parent
+        self.note_main = parent
+        self.tiles = {}
+        self.row = 0
+        self.column = 0
         
         self.configure_grid()
-        self.create_columns()
-        self.test()
-        # self.create_tiles()
+        self.show_saved_notes()
                       
     def configure_grid(self):
-        self.rowconfigure(0, weight=1, uniform='a')
+        """Configure grid layout for the frame."""
         self.columnconfigure((0,1,2,3), weight=1, uniform='a')
-        
-    def create_columns(self):
-        
-        self.col_1 = ctk.CTkFrame(self, fg_color='transparent')
-        self.col_1.grid(column=0, row=0, sticky='nsew')
-        
-        self.col_2 = ctk.CTkFrame(self, fg_color='transparent')
-        self.col_2.grid(column=1, row=0, sticky='nsew')
-        
-        self.col_3 = ctk.CTkFrame(self, fg_color='transparent')
-        self.col_3.grid(column=2, row=0, sticky='nsew')
-        
-        self.col_4 = ctk.CTkFrame(self, fg_color='transparent')
-        self.col_4.grid(column=3, row=0, sticky='nsew')
-        
-        self.columns = {1: self.col_1, 2: self.col_2, 3: self.col_3, 4: self.col_4}
     
-    def test(self):
-        NoteTile(self.col_1, self.main_instance)
-    
-    def create_tiles(self):
+    def show_saved_notes(self):
+        """Display saved notes from the file."""
+        data = NoteManager().import_notes()
         
+        for dictionary in data:
+            tile = NoteTile(self, main_instance=self.note_main, col=self.column, row=self.row, title_text=dictionary['title'], desc_text=dictionary['description'], tile_color=dictionary['background_color'], id_note=dictionary['id'])
+            self.tiles[str(dictionary['id'])] = tile
+            self.column += 1
+            if self.column > 3:
+                self.column = 0
+                self.row += 1
         
-        for key, master in self.columns.items():
-            ctk.CTkLabel(master=master, text="text", fg_color='red', height=100).pack(side='top', expand='true', fill='both', padx=2, pady=2)
+    def add_new_note(self, title, description, background_color, id_note):
+        """Add a new note to the beginning of the grid and shift other notes."""
+        tile = NoteTile(self, main_instance=self.note_main, col=self.column, row=self.row, title_text=title, desc_text=description, tile_color=background_color, id_note=id_note)
+        self.tiles[str(id_note)] = tile
+        self.column += 1
+        if self.column > 3:
+            self.column = 0
+            self.row += 1
+        self.reposition_notes()
 
-        ctk.CTkLabel(master=self.columns[1], text="text", fg_color='blue', height=100).pack(side='top', expand='true', fill='both', padx=2, pady=2)
-        
-        ctk.CTkLabel(master=self.columns[1], text="text", fg_color='blue', height=150).pack(side='top', expand='true', fill='both', padx=2, pady=2)
-        
-        ctk.CTkLabel(master=self.columns[4], text="text", fg_color='blue', height=50).pack(side='top', expand='true', fill='both', padx=2, pady=2)
-        
-        ctk.CTkLabel(master=self.columns[2], text="text", fg_color='yellow', height=400).pack(side='top', expand='true', fill='both', padx=2, pady=2)
-        
-        ctk.CTkLabel(master=self.columns[3], text="text", fg_color='blue', height=200).pack(side='top', expand='true', fill='both', padx=2, pady=2)
+    def delete_note(self, id_note):
+        """Delete the note with the given ID and reposition the remaining notes."""
+        tile = self.tiles.get(str(id_note))
+        if tile:
+            tile.destroy()
+            del self.tiles[str(id_note)]
+            self.reposition_notes()
 
+    def reposition_notes(self):
+        """Reposition notes to fill empty spaces in the grid."""
+        notes = list(self.tiles.values())
+        col, row = 0, 0
+        for note in notes:
+            note.grid(column=col, row=row)  # Assuming NoteTile uses .grid() method for positioning
+            col += 1
+            if col > 3:
+                col = 0
+                row += 1
 
-# noinspection GrazieInspection
+        self.column, self.row = col, row
+        
+
 class NoteTile(ctk.CTkFrame):
     """NoteTile is a custom frame for displaying a note with title and description."""
     
-    def __init__(self, parent, main_instance):
-        super().__init__(parent, fg_color=NOTE_FG, width=500, border_width=3, border_color=NOTE_BORDER, corner_radius=10)
+    def __init__(self, parent, main_instance, col, row, title_text, desc_text, tile_color, id_note):
+        super().__init__(parent, fg_color=tile_color, width=500, border_width=3, border_color=NOTE_BORDER, corner_radius=10)
         
-        self.note_bar = parent
+        self.parent = parent
         self.note_main = main_instance
+        # self.note_main = main_instance
+        self.title_text = title_text
+        self.desc_text = desc_text
+        self.id_note = id_note
+        
         self.configure_grid()
         self.initialize_widgets()
-        self.pack(pady=15)
+        self.grid(column=col, row=row, sticky='nsew', padx=2, pady=2)
         
     def configure_grid(self):
         """Configure grid layout."""
         self.columnconfigure(0, weight=1, uniform='a')
         self.rowconfigure(0, weight=2, uniform='a')
         self.rowconfigure(1, weight=4, uniform='a')
-        self.rowconfigure(2, weight=2, uniform='a')
+        self.rowconfigure(2, weight=1, uniform='a')
         self.grid_propagate(False)
         
     def initialize_widgets(self):
         """Initialize widgets."""
-        self.initialize_entry_title()
-        self.initialize_entry_description()
+        self.initialize_label_title()
+        self.initialize_label_description()
         self.initialize_button_frame()
         
-    def initialize_entry_title(self):
+    def initialize_label_title(self):
         """Initialize title entry."""
-        self.entry_title = ctk.CTkEntry(self,
-                                        placeholder_text="Tytuł", 
+        self.entry_title = ctk.CTkLabel(self,
+                                        text = self.title_text,
                                         font=ctk.CTkFont(family="Arial", size=20),
+                                        justify = 'left',
+                                        anchor = 'w',
                                         fg_color="transparent",
-                                        placeholder_text_color='white',
-                                        border_width=0)
+                                        )
         self.entry_title.grid(column=0, row=0, sticky='nsew', pady=5, padx=10)
         
-    def initialize_entry_description(self):
+    def initialize_label_description(self):
         """Initialize description entry."""
         self.entry_description = ctk.CTkTextbox(self, 
                                                 font=ctk.CTkFont(family="Arial", size=15),
-                                                fg_color="transparent")
+                                                
+                                                fg_color="transparent",
+                                                padx=2)
+        self.entry_description.insert("0.0", self.desc_text )
+        self.entry_description.configure(state='disable')
         self.entry_description.grid(column=0, row=1, sticky='nsew', padx=10)
+        self.entry_description.bind('<MouseWheel>', self._on_entry_description_scroll)
+
+    def _on_entry_description_scroll(self, event):
+        """Handle the mouse wheel scroll event for the entry_description."""
+        self.entry_description.yview_scroll(-1*(event.delta//120), "units")
+        return "break"
+        
         
     def initialize_button_frame(self):
         """Initialize button frame."""
@@ -305,29 +376,31 @@ class NoteTile(ctk.CTkFrame):
         self.button_frame.grid(column=0, row=2, sticky='nsew', padx=10, pady=5)
         
         self.color_button = ctk.CTkButton(self.button_frame,
-                                          text='',
+                                          text='X',
                                           width=30,
                                           fg_color='transparent',
                                           hover=False,
-                                          image=self.note_main.import_ico_images("color_palette.png"),
-                                          command=self.change_color)
+                                          command=self.delete_tile)
         self.color_button.pack_propagate(False)
-        self.color_button.pack(side='left', padx=2, pady=2)
+        self.color_button.pack(side='right', padx=2, pady=2)
     
-               
-    def change_color(self):
-        """Open top level window with color palette."""
-        self.note_main.top_level_color_management(self, self.color_button, self.set_color)
+    def delete_tile(self):
+        self.parent.delete_note(self.id_note)
+        self.note_main.delete_note(self.id_note)
+         
+    # def change_color(self):
+    #     """Open top level window with color palette."""
+    #     self.note_main.top_level_color_management(self, self.color_button, self.set_color)
         
-    def set_color(self, color):
-        """Set the selected color as the background ."""
-        self.configure(fg_color=color)
-        self.note_main.top_level.destroy()
+    # def set_color(self, color):
+    #     """Set the selected color as the background ."""
+    #     self.configure(fg_color=color)
+    #     self.note_main.top_level.destroy()
         
-    def cancel_button_click(self):
-        self.note_main.rowconfigure(0, weight=1, uniform='a')
-        self.note_bar.new_note_frame.pack_forget()
-        self.note_bar.default_frame.pack(pady=15)
+    # def cancel_button_click(self):
+    #     self.note_main.rowconfigure(0, weight=1, uniform='a')
+    #     self.note_bar.new_note_frame.pack_forget()
+    #     self.note_bar.default_frame.pack(pady=15)
 
 
 

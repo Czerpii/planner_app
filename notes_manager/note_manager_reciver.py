@@ -36,7 +36,7 @@ class NoteManager():
         os.remove(self.temp_file)
         return data
            
-    def save_note(self, note_content):
+    def save(self, note_content):
         
         self.decrypt_file(self.note_file_encrypted)
         with open(self.temp_file, 'a', encoding='utf-8') as file:
@@ -44,6 +44,29 @@ class NoteManager():
             writer.writerow(note_content)
         self.encrypt_file(self.temp_file)
         os.remove(self.temp_file)
+        
+    
+    def delete(self, id_note):
+        self.decrypt_file(self.note_file_encrypted)
+        # Czytaj wszystkie wiersze z pliku CSV
+        with open(self.temp_file, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            rows = list(reader)
+           
+
+        # Usuń zadanie o podanym ID
+        rows = [row for row in rows if row['id'] != str(id_note)]
+        # Zapisz wiersze z powrotem do pliku CSV
+        with open(self.temp_file, 'w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=self.headers)
+            writer.writeheader()
+            writer.writerows(rows)
+            
+        if os.path.exists(self.note_file_encrypted):
+            os.remove(self.note_file_encrypted)
+        self.encrypt_file(self.temp_file)
+        os.remove(self.temp_file) 
+            
         
     
     def encrypt_file(self, file_path):
