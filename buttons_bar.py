@@ -3,6 +3,7 @@ import customtkinter as ctk
 from PIL import Image
 from task_manager.task_manager_view import TaskManagerMain
 from notes_manager.note_manager_view import NoteManagerMain
+from currency_widget.currency_main import CurrencyMain
 import themes_manager
 
 class ButtonsBar(ctk.CTkFrame):
@@ -28,8 +29,10 @@ class ButtonsBar(ctk.CTkFrame):
         # View initializations
         self.task_manager_view = TaskManagerMain(self.parent, 0, 1)
         self.note_manager_view = NoteManagerMain(self.parent, 0, 1)
-        self.note_manager_view.grid_forget()
+        self.currency_widget_view = CurrencyMain(self.parent, 0, 1)
         self.task_manager_view.grid_forget()
+        self.note_manager_view.grid_forget()
+        self.currency_widget_view.grid_forget()
 
         # UI setup
         self.setup_ui_elements()
@@ -51,6 +54,10 @@ class ButtonsBar(ctk.CTkFrame):
         # NoteManager Button
         self.note_button = self.create_button(note_image,self.note_manager_button_click)
         self.note_button.grid(column=1, row=0, sticky='ns', pady=2)
+        
+        #Exchange rate button
+        self.exchange_button = self.create_button(note_image,self.exchange_rate_button_click)
+        self.exchange_button.grid(column=2, row=0, sticky='ns', pady=2, padx=5)
 
     def load_image(self, path, size):
         """Load an image from a given path and resize it to the specified size.
@@ -84,3 +91,7 @@ class ButtonsBar(ctk.CTkFrame):
     def note_manager_button_click(self):
         """Switch to the NoteManager view."""
         self.switch_view(self.note_manager_view)
+        
+    def exchange_rate_button_click(self):
+        """Switch to the ExchangeRate view"""
+        self.switch_view(self.currency_widget_view)
