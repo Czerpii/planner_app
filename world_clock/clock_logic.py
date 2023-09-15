@@ -27,7 +27,8 @@ class TimeZone():
         else:    
             response = requests.get(f"{self.api_url}{region}")
             if response.status_code != 200:
-                return []
+                print(f"Error: Unable to fetch data, status code: {response.status_code}")
+                return
             
             timezones = response.json()
        

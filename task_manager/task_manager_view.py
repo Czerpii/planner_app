@@ -1,12 +1,12 @@
+
 from typing import Optional, Tuple, Union
 import customtkinter as ctk
 from tkinter import ttk
 from PIL import Image
-import csv
-from task_manager.task_window import TaskWindow
+from .task_window import TaskWindow
+from .task_manager_reciver import TaskManager
 from ICommand import Delete
 from invoker import Invoker
-from task_manager.task_manager_reciver import TaskManager
 from UserSingleton import *
 import themes_manager
     

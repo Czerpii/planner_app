@@ -2,7 +2,7 @@ from typing import Optional, Tuple, Union
 import customtkinter as ctk
 import pytz 
 import time as tm
-from world_clock.clock_logic import *
+from .clock_logic import *
 import themes_manager
 
 
