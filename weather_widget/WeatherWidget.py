@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from typing import Optional, Tuple, Union
-from weather.WeatherComponents import *
+from .WeatherComponents import *
  
 class WeatherWidget(ctk.CTkFrame):
     def __init__(self, parent, col, row):

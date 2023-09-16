@@ -42,10 +42,10 @@ class WorldClock(ctk.CTkFrame):
         
         self.date_label = ctk.CTkLabel(frame,
                                   text=self.api_instance.get_current_date_with_weekday(self.timezone),
-                                  font =date_font )
+                                  font=themes_manager.get_ctk_font("date"))
         self.date_label.pack(side='top', anchor='center', pady=5)
         
-        self.digital_clock = ctk.CTkLabel(frame, font = digital_clock_font)
+        self.digital_clock = ctk.CTkLabel(frame, font=themes_manager.get_ctk_font("clock"))
         self.digital_clock.pack(side='top', anchor='center')
         
       
@@ -54,9 +54,9 @@ class WorldClock(ctk.CTkFrame):
        
         self.timezones = ctk.CTkButton(self,
                                  text =f"{self.api_instance.get_actuall_timezone('region')}, {self.api_instance.get_actuall_timezone('city')}",
-                                 fg_color=themes_manager.get_color("button"),
-                                 hover_color=themes_manager.get_color("button_hover"),
-                                 font = ctk.CTkFont(family='Arial Black', size=10), 
+                                 fg_color=themes_manager.get_color("fg_frame"),
+                                 hover = False,
+                                 font=themes_manager.get_ctk_font("date"), 
                                  corner_radius=5,
                                  command= self.open_time_zone_window)
         self.timezones.grid(column=0, row=0, sticky='nsew', padx=3, pady=2)
@@ -94,10 +94,7 @@ class TimezonesWindow(ctk.CTkToplevel):
         
     
     def setup_window(self):
-        # screen_width = self.winfo_screenwidth()
-        # screen_height = self.winfo_screenheight()
-        # center_x = int(screen_width / 2 - 700 / 2)
-        # center_y = int(screen_height / 2 - 400 / 2)
+        
         x_pos = self.parent.winfo_rootx()
         y_pos = self.parent.winfo_rooty()
         
@@ -132,15 +129,14 @@ class TimezonesWindow(ctk.CTkToplevel):
         tm_frame.rowconfigure(0, weight=1, uniform='a')
         
         
-        font = ctk.CTkFont(family='Arial Black', size=20)
         
         self.city_label = ctk.CTkLabel(tm_frame,
-                                       font = font,
+                                       font = themes_manager.get_ctk_font("small_header"),
                                        text=f"{self.start_region}, {self.start_city}"
                                        )
         self.city_label.grid(column=1, row=0, sticky='nse', padx=2)
         
-        self.time_label = ctk.CTkLabel(tm_frame, font=font)
+        self.time_label = ctk.CTkLabel(tm_frame, font=themes_manager.get_ctk_font("small_header"))
         self.time_label.grid(column=2, row=0, sticky='nsew', padx=2)
         
         self.api_instance.display_time(timezone_str=self.start_timezone,
@@ -156,7 +152,12 @@ class TimezonesWindow(ctk.CTkToplevel):
         regions = ["Europa", "Ameryka", "Afryka", "Azja", "Oceania"]
         
         for region in regions:
-            ctk.CTkButton(frame, text=region, fg_color=themes_manager.get_color('button'), hover_color=themes_manager.get_color('button_hover'),command=lambda region=region: self.set_region(region)).pack(side='left', padx=2, fill='both')
+            ctk.CTkButton(frame,
+                          font =themes_manager.get_ctk_font("button"),
+                          text=region, 
+                          fg_color=themes_manager.get_color('button'),
+                          hover_color=themes_manager.get_color('button_hover'),
+                          command=lambda region=region: self.set_region(region)).pack(side='left', padx=2, fill='both')
         
     
     def cities_frame(self, region):
@@ -164,11 +165,19 @@ class TimezonesWindow(ctk.CTkToplevel):
         self.cities = self.api_instance.get_cities(region)
         self.search_var = ctk.StringVar()
         
-        search_entry = ctk.CTkEntry(self, placeholder_text='Szukaj', fg_color=themes_manager.get_color('entry'), border_width=0, textvariable=self.search_var)
+        search_entry = ctk.CTkEntry(self,
+                                    placeholder_text='Szukaj',
+                                    font=themes_manager.get_ctk_font("entry"),
+                                    fg_color=themes_manager.get_color('entry'),
+                                    border_width=0,
+                                    textvariable=self.search_var)
         search_entry.grid(column=0, columnspan=3, row=2, sticky='nsew', padx=10, pady=5)
         self.search_var.trace('w', self.filter_cities)
         
-        self.scroll_frame = ctk.CTkScrollableFrame(self, fg_color='transparent')
+        self.scroll_frame = ctk.CTkScrollableFrame(self,
+                                                   fg_color='transparent',
+                                                   scrollbar_button_color=themes_manager.get_color('button'),
+                                                   scrollbar_button_hover_color=themes_manager.get_color("button_hover"))
         self.scroll_frame.grid(column=0, row=3, sticky='nsew')
         
         self.scroll_frame.columnconfigure((0,1,2), weight=1, uniform='a')
@@ -181,10 +190,18 @@ class TimezonesWindow(ctk.CTkToplevel):
         frame = ctk.CTkFrame(self, fg_color='transparent')
         frame.grid(column=0, row=4, sticky='nsew')
         
-        save_button = ctk.CTkButton(frame, text='Zapisz',fg_color=themes_manager.get_color('button'), hover_color=themes_manager.get_color('button_hover'), command=self.save_button_click)
+        save_button = ctk.CTkButton(frame, text='Zapisz',
+                                    font = themes_manager.get_ctk_font("button"),
+                                    fg_color=themes_manager.get_color('button'),
+                                    hover_color=themes_manager.get_color('button_hover'),
+                                    command=self.save_button_click)
         save_button.pack(side='right', fill='both', padx=4, pady=4)
         
-        cancel_button = ctk.CTkButton(frame, text='Anuluj',fg_color=themes_manager.get_color('button'), hover_color=themes_manager.get_color('button_hover'), command=lambda: self.destroy())
+        cancel_button = ctk.CTkButton(frame, text='Anuluj',
+                                      font = themes_manager.get_ctk_font("button"),
+                                      fg_color=themes_manager.get_color('button'),
+                                      hover_color=themes_manager.get_color('button_hover'),
+                                      command=lambda: self.destroy())
         cancel_button.pack(side='right', fill='both', padx=4, pady=4)
                 
     
@@ -206,6 +223,7 @@ class TimezonesWindow(ctk.CTkToplevel):
             city = timezone.split('/')[-1].replace('_', ' ')
             ctk.CTkButton(self.scroll_frame,
                          text=city,
+                         font = themes_manager.get_ctk_font("button"),
                          fg_color=themes_manager.get_color('button'),
                          hover_color=themes_manager.get_color('button_hover'),
                         command=lambda city=city, timezone=timezone: self.city_button_click(city, timezone)).grid(column=column, row=row, sticky='nsew', padx=2, pady=2)

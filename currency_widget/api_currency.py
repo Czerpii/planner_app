@@ -14,7 +14,7 @@ class CurrencyApi:
     
     def fetch_currency_table_A(self):
         
-        self.api_parameters = f"tables/A/today"
+        self.api_parameters = f"tables/A/"
         self.api_url = self.build_url(self.api_parameters)
         
         response = requests.get(self.api_url)
@@ -41,7 +41,7 @@ class CurrencyApi:
         return data
 
     def fetch_currency_table_C(self):
-        self.api_parameters = f"tables/C/today"
+        self.api_parameters = f"tables/C/"
         self.api_url = self.build_url(self.api_parameters)
         
         response = requests.get(self.api_url)

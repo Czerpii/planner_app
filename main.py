@@ -66,14 +66,13 @@ class Main(ctk.CTk):
 
     def user_management_view(self):
         """Initialize and display the user management view."""
-        self.configure(fg_color="#0b2e6b")
         LoginView(self)
 
     def create_ui_elements(self):
         """Create and configure UI elements for the main view."""
         self.configure_grid_main_view()
         InfoBar(self, col=1, row=0, rowspan=2)
-        ButtonsBar(self, 0, 0)
+        buttons_bar = ButtonsBar(self, 0, 0)
         # default_view = TaskManagerMain(self, 0, 1)
         # buttons_bar.switch_view(default_view)
 

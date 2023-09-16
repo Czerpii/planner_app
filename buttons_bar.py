@@ -25,14 +25,12 @@ class ButtonsBar(ctk.CTkFrame):
         self.grid(column=col, row=row, sticky='nsew',)
         self.parent = parent
         self.current_view = None
+        self.active_button = None
 
         # View initializations
-        self.task_manager_view = TaskManagerMain(self.parent, 0, 1)
-        self.note_manager_view = NoteManagerMain(self.parent, 0, 1)
-        self.currency_widget_view = CurrencyMain(self.parent, 0, 1)
-        self.task_manager_view.grid_forget()
-        self.note_manager_view.grid_forget()
-        self.currency_widget_view.grid_forget()
+        self.task_manager_view = None
+        self.note_manager_view = None
+        self.currency_widget_view = None
 
         # UI setup
         self.setup_ui_elements()
@@ -42,11 +40,10 @@ class ButtonsBar(ctk.CTkFrame):
         # Configuring grid for layout
         self.rowconfigure(0, weight=1, uniform='a')
         self.columnconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1, uniform='a')
-
         # Image setup for buttons
-        task_image = self.load_image("./button_image/tasks.png", (40, 40))
-        note_image = self.load_image("./button_image/note.png", (40, 40))
-
+        task_image = self.load_image("./button_image/tasks.png", (35, 35))
+        note_image = self.load_image("./button_image/note.png", (35, 35))
+        currency_image = self.load_image("./button_image/currency.png", (35,35))
         # TaskManager Button
         self.task_manager_button = self.create_button(task_image, self.task_manager_button_click)
         self.task_manager_button.grid(column=0, row=0, sticky='ns', padx=5, pady=2)
@@ -56,7 +53,7 @@ class ButtonsBar(ctk.CTkFrame):
         self.note_button.grid(column=1, row=0, sticky='ns', pady=2)
         
         #Exchange rate button
-        self.exchange_button = self.create_button(note_image,self.exchange_rate_button_click)
+        self.exchange_button = self.create_button(currency_image,self.exchange_rate_button_click)
         self.exchange_button.grid(column=2, row=0, sticky='ns', pady=2, padx=5)
 
     def load_image(self, path, size):
@@ -75,23 +72,49 @@ class ButtonsBar(ctk.CTkFrame):
         :param command: Command to execute when the button is clicked.
         :return: Created button.
         """
-        return ctk.CTkButton(self, text="", fg_color=themes_manager.get_color("button"), hover_color=themes_manager.get_color('button_hover'), image=image, command=command)
+        return ctk.CTkButton(self, text="", fg_color="transparent", hover_color=themes_manager.get_color('fg_frame'), image=image, command=command)
 
-    def switch_view(self, new_view):
+    def init_task_manager_view(self):
+        """Initialize the TaskManager view if it's not already initialized."""
+        if not self.task_manager_view:
+            self.task_manager_view = TaskManagerMain(self.parent, 0, 1)
+
+    def init_note_manager_view(self):
+        """Initialize the NoteManager view if it's not already initialized."""
+        if not self.note_manager_view:
+            self.note_manager_view = NoteManagerMain(self.parent, 0, 1)
+
+    def init_currency_widget_view(self):
+        """Initialize the CurrencyMain view if it's not already initialized."""
+        if not self.currency_widget_view:
+            self.currency_widget_view = CurrencyMain(self.parent, 0, 1)
+          
+    def switch_view(self, new_view, new_active_button):
         """Switch to the given view, hiding the current one."""
         if self.current_view:
             self.current_view.grid_forget()
         self.current_view = new_view
         self.current_view.grid(column=0, row=1, sticky='nsew')
 
+        # Reset the color of the previously active button
+        if self.active_button:
+            self.active_button.configure(fg_color="transparent")
+
+        # Set the new active button and change its color
+        self.active_button = new_active_button
+        self.active_button.configure(fg_color=themes_manager.get_color("fg_frame")) 
+
     def task_manager_button_click(self):
         """Switch to the TaskManager view."""
-        self.switch_view(self.task_manager_view)
+        self.init_task_manager_view()
+        self.switch_view(self.task_manager_view, self.task_manager_button)
 
     def note_manager_button_click(self):
         """Switch to the NoteManager view."""
-        self.switch_view(self.note_manager_view)
+        self.init_note_manager_view()
+        self.switch_view(self.note_manager_view, self.note_button)
         
     def exchange_rate_button_click(self):
         """Switch to the ExchangeRate view"""
-        self.switch_view(self.currency_widget_view)
+        self.init_currency_widget_view()
+        self.switch_view(self.currency_widget_view, self.exchange_button)

@@ -10,11 +10,6 @@ from invoker import Invoker
 from UserSingleton import *
 import themes_manager
     
-###colors### 
-#tiles
-FRAME_TILES = "#1b2127"
-TILES = "#303742"
-TILES_HOVER = "#6e737b"
 
 #priority color
 HIGH_PRIORITY = '#a90205'
@@ -82,8 +77,38 @@ class TaskManagerTable(ctk.CTkFrame):
 
     def configure_treeview_style(self):
         style = ttk.Style()
-        style.configure("Treeview", font=('Helvetica', 10), foreground="black", background="lightblue", fieldbackground="lightblue", rowheight=50)
-        style.configure("Treeview.Heading", background="blue", foreground="black")
+        
+        # Ustawienie niestandardowego stylu dla nagłówka Treeview
+        style.layout('Treeview.Heading', [
+            ('Treeview.Heading.cell', {'sticky': 'nswe'}),
+            ('Treeview.Heading.border', {'sticky': 'nswe', 'children': [
+                ('Treeview.Heading.padding', {'sticky': 'nswe', 'children': [
+                    ('Treeview.Heading.image', {'side': 'right', 'sticky': ''}),
+                    ('Treeview.Heading.text', {'sticky': 'w'})
+                ]})
+            ]})
+        ])
+        
+        # Ustawienie stylu dla głównej części Treeview
+        style.configure("Treeview", font=('San Francisco', 10), foreground="white", 
+                        background=themes_manager.get_color("background"), 
+                        fieldbackground=themes_manager.get_color("background"),
+                        lineseparatorcolor = themes_manager.get_color('border_entry'),
+                        
+                        rowheight=50)
+        style.layout("Treeview", [('Treeview.treearea', {'sticky': 'nswe'})]) 
+        
+        # Ustawienie stylu dla nagłówków Treeview
+        style.configure('Treeview.Heading', 
+                        font=('San Francisco', 12, 'bold'),
+                        background = themes_manager.get_color("fg_frame"),
+                        foreground='white', 
+                        relief='flat')
+        
+        style.map('Treeview',
+          background=[('selected', themes_manager.get_color('fg_frame'))],  # 'red' to kolor podświetlenia
+          foreground=[('selected', 'white')]  # 'white' to kolor tekstu dla zaznaczonego wiersza
+          )
 
     def configure_treeview_columns(self):
         self.task_list.column('#0', width=0, stretch=False)
@@ -202,10 +227,12 @@ class TaskManagerTiles(ctk.CTkFrame):
              
     def create_scrollable_frame(self, text):
         frame = ctk.CTkScrollableFrame(self,
-                                       fg_color=themes_manager.get_color('task_frame'),
+                                       fg_color=themes_manager.get_color('fg_frame'),
                                        scrollbar_button_color=themes_manager.get_color('scrollbar'),
                                        scrollbar_button_hover_color=themes_manager.get_color('scrollbar_hover'))
-        ctk.CTkLabel(frame, text=text).pack()
+        ctk.CTkLabel(frame,
+                     text=text,
+                     font = themes_manager.get_ctk_font('default_bold')).pack()
         frame.pack(side='left', expand='true', fill="both", padx=3)
         return frame
 
@@ -287,19 +314,20 @@ class TilesCreator(ctk.CTkFrame):
         self.id_task_tile = id_task
         
         
-        self.name_font = ctk.CTkFont(family="Abril Fatface", size=15, weight="bold")
+        
         
         
         
         self.title_label = ctk.CTkLabel(self, text=title_name,
                                 wraplength=self.winfo_width(), 
                                 justify='left',
-                                font=self.name_font)
+                                font=themes_manager.get_ctk_font('small_header'))
         self.title_label.grid(column=0, row=0, columnspan=2, sticky='nw', pady=5, padx=5)
         
         
         self.priority_label = ctk.CTkLabel(self, text=priority_name, fg_color=color, corner_radius=5)
         self.priority_label.grid(column=0, row=1, sticky='nsew', padx=5, pady=2)
+        self.priority_label.grid_propagate("false")
         
         self.priority_list = self.priority_label
 
@@ -360,8 +388,8 @@ class TaskManagerButtonBar(ctk.CTkFrame):
         self.columnconfigure(10, weight=1, uniform='a')
         
         #add images - zmienic na ctkimage
-        refresh_image = ctk.CTkImage(dark_image= Image.open("./button_image/refresh.png"),
-                                     light_image= Image.open("./button_image/refresh.png"))
+        change_image = ctk.CTkImage(dark_image= Image.open("./button_image/change.png"),
+                                     light_image= Image.open("./button_image/change.png"))
         
         ####buttons#####
         #new task button - open new window
@@ -377,17 +405,17 @@ class TaskManagerButtonBar(ctk.CTkFrame):
         self.selection_button = self.create_button(text='Status', row=0, column=9, command=self.status_selection_button_click, image=None)
         self.selection_button.grid_remove()
         # change view 
-        self.change_view_button =self.create_button(text ='', row=0, column=10, command=self.change_view_button_click, image=refresh_image)
+        self.change_view_button =self.create_button(text ='', row=0, column=10, command=self.change_view_button_click, image=change_image)
            
     #create button
     def create_button(self, text, row, column, command, image):
         button = ctk.CTkButton(self, 
                       text = text,
+                      font = themes_manager.get_ctk_font("button"),
                       command=command,
                       image=image,
                       fg_color=themes_manager.get_color('button'),
                       hover_color=themes_manager.get_color('button_hover'),
-                      text_color='black'
                       )
         button.grid(row = row, 
                     column=column, 

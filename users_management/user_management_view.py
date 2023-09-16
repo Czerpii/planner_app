@@ -1,12 +1,12 @@
 import customtkinter as ctk
 from users_management.user_management_local import Users
-
+import themes_manager
 
 
 
 class LoginView(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(parent, fg_color='#0c3377', corner_radius=10, width=200, height=300)
+        super().__init__(parent, fg_color=themes_manager.get_color("fg_frame"), corner_radius=10, width=200, height=300)
         self.pack(pady = 150)
         
         self.parent=parent
@@ -16,7 +16,7 @@ class LoginView(ctk.CTkFrame):
         
         self.main_label = ctk.CTkLabel(self,
                                        text = "Logowanie",
-                                       font=ctk.CTkFont(family="Abril Fatface", size=30, weight="bold"))
+                                       font=themes_manager.get_ctk_font('header'))
         self.main_label.grid(column=0, columnspan=2, row=0, sticky='nsew', pady=10)
         
         self.create_userdata_frame()
@@ -41,13 +41,21 @@ class LoginView(ctk.CTkFrame):
         
         self.userdata_frame.columnconfigure(0, weight=1, uniform='b')
         self.userdata_frame.rowconfigure((0,2), weight=1, uniform='b')
-        # self.userdata_frame.rowconfigure((1), weight=1, uniform='b')
         
         
-        self.username_entry = ctk.CTkEntry(self.userdata_frame, placeholder_text='Nazwa użytkownika')
+        self.username_entry = ctk.CTkEntry(self.userdata_frame,
+                                           fg_color=themes_manager.get_color("entry"),
+                                           border_color=themes_manager.get_color("border_entry"),
+                                           font = themes_manager.get_ctk_font("entry"),
+                                           placeholder_text='Nazwa użytkownika')
         self.username_entry.grid(column=0, row=0, columnspan=2, sticky='nsew',  pady=10)
         
-        self.userpassword_entry = ctk.CTkEntry(self.userdata_frame, placeholder_text='Hasło', show="*")
+        self.userpassword_entry = ctk.CTkEntry(self.userdata_frame,
+                                               fg_color=themes_manager.get_color("entry"),
+                                               border_color=themes_manager.get_color("border_entry"),
+                                               font = themes_manager.get_ctk_font("entry"),
+                                               placeholder_text='Hasło',
+                                               show="*")
         self.userpassword_entry.grid(column=0, row=2, columnspan=2, sticky='nsew', pady=10)
         
         self.userpassword_entry.bind("<Return>", self.enter_click)
@@ -60,23 +68,31 @@ class LoginView(ctk.CTkFrame):
         self.buttons_frame.columnconfigure((0,1), weight=1, uniform='b')
         self.buttons_frame.rowconfigure(0, weight=1, uniform='b')
         
-        self.login_button = ctk.CTkButton(self.buttons_frame, text="Zaloguj się", command=self.login_button_click)
-        self.login_button.grid(column=1, row=0, sticky='nsew')
+        self.login_button = ctk.CTkButton(self.buttons_frame,text="Zaloguj się",
+                                          fg_color= themes_manager.get_color("button"),
+                                          hover_color=themes_manager.get_color("button_hover"),
+                                          font = themes_manager.get_ctk_font('button'),
+                                          command=self.login_button_click)
+        self.login_button.grid(column=1, row=0, sticky='nsew', padx=2)
         
         self.remember_me_button = ctk.CTkCheckBox(self.buttons_frame,
                                                   text='Zapamiętaj mnie',
                                                   command=self.remember_me_func,
                                                   variable=self.remember_me_state,
+                                                  font = themes_manager.get_ctk_font('button'),
+                                                  fg_color=themes_manager.get_color("button"),
+                                                  hover_color=themes_manager.get_color("button_hover"),
                                                   onvalue='on',
                                                   offvalue='off')
-        self.remember_me_button.grid(column=0, row=0, sticky='nsew')
+        self.remember_me_button.grid(column=0, row=0, sticky='nsew', padx=2)
         
     def create_additional_buttons(self):
         
-        self.forget_password_button = ctk.CTkButton(self, text="Nie pamiętasz hasła?", fg_color="#0c3377", hover_color="#0a295f")
-        self.forget_password_button.grid(column=0, row=5, columnspan=2, sticky='nsew', padx=15, pady=2)
-        
-        self.registration_button = ctk.CTkButton(self, text="Zarejestruj się", fg_color="#0c3377", hover_color="#0a295f", command=self.open_registration_form)
+        self.registration_button = ctk.CTkButton(self, text="Zarejestruj się",
+                                                 font = themes_manager.get_ctk_font('button'),
+                                                 fg_color=themes_manager.get_color("fg_frame"),
+                                                 hover = False,
+                                                 command=self.open_registration_form)
         self.registration_button.grid(column=0, row=6, columnspan=2, sticky='nsew', padx=15, pady=2)
 
     def info_label(self):
@@ -105,7 +121,7 @@ class LoginView(ctk.CTkFrame):
         
 class RegistrationView(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(parent, fg_color='#0c3377', corner_radius=10)
+        super().__init__(parent, fg_color=themes_manager.get_color("fg_frame"), corner_radius=10)
         self.pack(pady = 150)
         
         self.users_management = Users(self)
@@ -115,7 +131,7 @@ class RegistrationView(ctk.CTkFrame):
         
         self.main_label = ctk.CTkLabel(self,
                                        text = "Rejestracja",
-                                       font=ctk.CTkFont(family="Abril Fatface", size=30, weight="bold"))
+                                       font=themes_manager.get_ctk_font('header'),)
         self.main_label.grid(column=0, columnspan=2, row=0, sticky='nsew', pady=10, padx=100)
         
         self.create_userdata_frame()
@@ -137,16 +153,30 @@ class RegistrationView(ctk.CTkFrame):
         self.userdata_frame.rowconfigure((0,1,2,3), weight=2, uniform='b')
         # self.userdata_frame.rowconfigure((1), weight=1, uniform='b')
         
-        self.username_entry = ctk.CTkEntry(self.userdata_frame, placeholder_text='Nazwa użytkownika')
+        self.username_entry = ctk.CTkEntry(self.userdata_frame, placeholder_text='Nazwa użytkownika',
+                                           fg_color=themes_manager.get_color("entry"),
+                                           border_color=themes_manager.get_color("border_entry"),
+                                           font = themes_manager.get_ctk_font("entry"),)
         self.username_entry.grid(column=0, row=0, sticky='nsew',  pady=10)
         
-        self.email_entry = ctk.CTkEntry(self.userdata_frame, placeholder_text='Adres e-mail')
+        self.email_entry = ctk.CTkEntry(self.userdata_frame, placeholder_text='Adres e-mail',
+                                        fg_color=themes_manager.get_color("entry"),
+                                        border_color=themes_manager.get_color("border_entry"),
+                                        font = themes_manager.get_ctk_font("entry"),)
         self.email_entry.grid(column=0, row=1, sticky='nsew', pady=10)
         
-        self.userpassword_entry = ctk.CTkEntry(self.userdata_frame, placeholder_text='Hasło', show="*")
+        self.userpassword_entry = ctk.CTkEntry(self.userdata_frame, placeholder_text='Hasło',
+                                            fg_color=themes_manager.get_color("entry"),
+                                            border_color=themes_manager.get_color("border_entry"),
+                                            font = themes_manager.get_ctk_font("entry"),
+                                            show="*")
         self.userpassword_entry.grid(column=0, row=2, sticky='nsew', pady=10)
         
-        self.userpassword_repeat_entry = ctk.CTkEntry(self.userdata_frame, placeholder_text='Powtórz hasło', show="*")
+        self.userpassword_repeat_entry = ctk.CTkEntry(self.userdata_frame, placeholder_text='Powtórz hasło',
+                                                      fg_color=themes_manager.get_color("entry"),
+                                                      border_color=themes_manager.get_color("border_entry"),
+                                                      font = themes_manager.get_ctk_font("entry"),
+                                                      show="*")
         self.userpassword_repeat_entry.grid(column=0, row=3, sticky='nsew', pady=10)
              
     def create_registration_buttons_frame(self):
@@ -157,7 +187,11 @@ class RegistrationView(ctk.CTkFrame):
         self.buttons_frame.columnconfigure((0,1), weight=1, uniform='b')
         self.buttons_frame.rowconfigure(0, weight=1, uniform='b')
         
-        self.login_button = ctk.CTkButton(self.buttons_frame, text="Zarejestruj się", command=self.registration_button)
+        self.login_button = ctk.CTkButton(self.buttons_frame, text="Zarejestruj się",
+                                          fg_color= themes_manager.get_color("button"),
+                                          hover_color=themes_manager.get_color("button_hover"),
+                                          font = themes_manager.get_ctk_font('button'),
+                                          command=self.registration_button)
         self.login_button.grid(column=0, row=0, columnspan=2, sticky='nsew')
     
     def info_label(self):

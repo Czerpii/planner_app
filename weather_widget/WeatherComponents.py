@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from weather.OpenWeatherMap import *
+from .OpenWeatherMap import *
 from location.ApiLocation import *
 from PIL import Image, ImageTk
 import themes_manager
@@ -7,7 +7,7 @@ import themes_manager
 
 class LocationPanel(ctk.CTkFrame):
     def __init__(self, parent, col, row, weather_daily_panel, weather_forecast_panel):
-        super().__init__(parent, fg_color=themes_manager.get_color("foreground_infobar"), corner_radius=5)
+        super().__init__(parent, fg_color="transparent", corner_radius=5)
         self.grid(column = col, row = row, sticky = 'nsew', pady=3, padx=3)
          
         self.location = ApiLocation()
@@ -24,6 +24,7 @@ class LocationPanel(ctk.CTkFrame):
         combobox_value = self.location.get_all_location()
         self.combo = ctk.CTkComboBox(self, 
                         values=combobox_value,
+                        font=themes_manager.get_ctk_font('entry'),
                         fg_color=themes_manager.get_color('entry'),
                         button_color=themes_manager.get_color("button"),
                         button_hover_color=themes_manager.get_color("button_hover"),
@@ -36,7 +37,7 @@ class LocationPanel(ctk.CTkFrame):
                         command=self.choose_location)
         
         self.combo.set(self.location.get_location_with_default_state())
-        self.combo.grid(column = 0, row =0, sticky = 'nsew', pady = 4, padx=3) 
+        self.combo.grid(column = 0, row =0, sticky = 'nsew') 
         self.combo.bind('<Return>', self.add_new)
       
     def choose_location(self, event):
@@ -58,7 +59,7 @@ class LocationPanel(ctk.CTkFrame):
                
 class WeatherDailyPanel(ctk.CTkFrame):
     def __init__(self, parent, col, row):
-        super().__init__(parent, fg_color='transparent', corner_radius=5)
+        super().__init__(parent, fg_color=themes_manager.get_color("fg_frame"), corner_radius=5)
         self.grid(column=col, row=row, sticky='nsew', padx=3, pady=3)
         
         weather =  OpenWeaterMap.get_weather_today(ApiLocation().get_location_with_default_state())
@@ -73,13 +74,17 @@ class WeatherDailyPanel(ctk.CTkFrame):
         
         #nazwy
         ctk.CTkLabel(self,
-                     text = 'Odczuwalna:').grid(column = 0, row = 2, sticky = 'w', padx=2)
+                     text = 'Odczuwalna:',
+                     font=themes_manager.get_ctk_font("default")).grid(column = 0, row = 2, sticky = 'w', padx=2)
         ctk.CTkLabel(self,
-                     text = 'Ciśnienie:').grid(column = 0, row = 3, sticky = 'w',  padx=2)
+                     text = 'Ciśnienie:',
+                     font=themes_manager.get_ctk_font("default")).grid(column = 0, row = 3, sticky = 'w',  padx=2)
         ctk.CTkLabel(self,
-                     text = 'Wilgotność:').grid(column = 0, row = 4, sticky = 'w', padx=2 )
+                     text = 'Wilgotność:',
+                     font=themes_manager.get_ctk_font("default")).grid(column = 0, row = 4, sticky = 'w', padx=2 )
         ctk.CTkLabel(self,
-                     text = 'Prędkość wiatru:').grid(column = 0, row = 5, sticky = 'w', padx=2)
+                     text = 'Prędkość wiatru:',
+                     font=themes_manager.get_ctk_font("default")).grid(column = 0, row = 5, sticky = 'w', padx=2)
         
         #wartości
         self.temperature_frame = ctk.CTkFrame(self, fg_color='transparent')
@@ -94,26 +99,37 @@ class WeatherDailyPanel(ctk.CTkFrame):
           
         self.temperature_label = ctk.CTkLabel(self.temperature_frame,
                      text = f"{weather['temp']}\N{DEGREE SIGN}C",
-                     font = ctk.CTkFont(family='Calibri', size=50, weight='bold'),
+                     font = ctk.CTkFont(family='San Francisco', size=50, weight='bold'),
                     )
         self.temperature_label.grid(column=1 ,row = 0, sticky = 'nsew', pady=5, padx=3)
         
-        self.description_label = ctk.CTkLabel(self, text=f"{weather['description']}")
+        self.description_label = ctk.CTkLabel(self,
+                                              text=f"{weather['description']}",
+                                              font=themes_manager.get_ctk_font("default"))
         self.description_label.grid(column=0, columnspan =2, row = 1, sticky = 'nsew')
         
-        self.feels_like_label = ctk.CTkLabel(self,text = f"{weather['feels_like']}\N{DEGREE SIGN}C")
+        self.feels_like_label = ctk.CTkLabel(self,
+                                             text = f"{weather['feels_like']}\N{DEGREE SIGN}C",
+                                             font=themes_manager.get_ctk_font("default"))
         self.feels_like_label.grid(column=1, row = 2, sticky='w')
         
-        self.pressure_label = ctk.CTkLabel(self,text = f"{weather['pressure']} hPa")
+        self.pressure_label = ctk.CTkLabel(self,
+                                           text = f"{weather['pressure']} hPa",
+                                           font=themes_manager.get_ctk_font("default"))
         self.pressure_label.grid(column=1, row = 3, sticky='w')
         
-        self.humidity_label = ctk.CTkLabel(self,text = f"{weather['humidity']}%")
+        self.humidity_label = ctk.CTkLabel(self,
+                                           text = f"{weather['humidity']}%",
+                                           font=themes_manager.get_ctk_font("default"))
         self.humidity_label.grid(column=1, row = 4, sticky='w')
-        self.wind_label = ctk.CTkLabel(self,text = f"{weather['wind']} m/s")
+        
+        self.wind_label = ctk.CTkLabel(self,
+                                       text = f"{weather['wind']} m/s",
+                                       font=themes_manager.get_ctk_font("default"))
         self.wind_label.grid(column=1, row = 5, sticky='w')
 
         self.set_icon_based_on_weather_status(weather['weather_ico'])
-        self.set_background_based_on_weather_status(weather['weather_main'])
+        # self.set_background_based_on_weather_status(weather['weather_main'])
         self.start_updating_weather()
 
     def update_daily_weather(self):
@@ -129,7 +145,6 @@ class WeatherDailyPanel(ctk.CTkFrame):
         self.wind_label.configure(text=f"{weather['wind']} m/s")      
         self.description_label.configure(text=f"{weather['description']}")
 
-        self.set_background_based_on_weather_status(weather['weather_main'])
         self.set_icon_based_on_weather_status(weather['weather_ico'])
     
     def start_updating_weather(self, interval=600000):
@@ -138,23 +153,23 @@ class WeatherDailyPanel(ctk.CTkFrame):
         self.after(interval, self.start_updating_weather, interval)
     
     def set_icon_based_on_weather_status(self, weather_ico):
-        image = ctk.CTkImage(Image.open(f"./weather/weather_status_image/{weather_ico}.png"), size=(50,50))
+        image = ctk.CTkImage(Image.open(f"./weather_widget/weather_status_image/{weather_ico}.png"), size=(50,50))
         self.ico_label.configure(image=image)
         
     
-    def set_background_based_on_weather_status(self, weather_condition):
-        background_color = {
-            'Thunderstorm': "#2F4F4F",  # Ciemnoszary (Dark Slate Gray)
-            'Drizzle': "#B0E0E6",  # Jasnoblękitny (Powder Blue)
-            'Rain': "#4682B4",  # Stalowy niebieski (Steel Blue)
-            'Snow': "#87CEEB",  # Jasnoblękitny (Sky Blue)
-            'Atmosphere': "#778899",  # Jasnoszary (Light Slate Gray)
-            'Clear': "#1E90FF",  # Intensywny niebieski (Dodger Blue)
-            'Clouds': "#708090"  # Słate Grey
-        }
-        color = background_color[weather_condition]
+    # def set_background_based_on_weather_status(self, weather_condition):
+    #     background_color = {
+    #         'Thunderstorm': "#2F4F4F",  # Ciemnoszary (Dark Slate Gray)
+    #         'Drizzle': "#B0E0E6",  # Jasnoblękitny (Powder Blue)
+    #         'Rain': "#4682B4",  # Stalowy niebieski (Steel Blue)
+    #         'Snow': "#87CEEB",  # Jasnoblękitny (Sky Blue)
+    #         'Atmosphere': "#778899",  # Jasnoszary (Light Slate Gray)
+    #         'Clear': "#1E90FF",  # Intensywny niebieski (Dodger Blue)
+    #         'Clouds': "#708090"  # Słate Grey
+    #     }
+    #     color = background_color[weather_condition]
         
-        self.configure(fg_color = color)
+    #     self.configure(fg_color = color)
         
         
         
@@ -185,7 +200,7 @@ class Weather5DaysPanel(ctk.CTkFrame):
         for date in self.default_weather.keys():
             day_of_week, day_and_month = date.split(', ')
             formatted_date = f"{day_of_week}\n{day_and_month}"
-            ctk.CTkLabel(self, text=formatted_date, font=font).grid(column=0, row=row, sticky="nsew", padx=2, pady=2)
+            ctk.CTkLabel(self, text=formatted_date, font=themes_manager.get_ctk_font("default")).grid(column=0, row=row, sticky="nsew", padx=2, pady=2)
             row += 1
             
     
@@ -201,10 +216,10 @@ class Weather5DaysPanel(ctk.CTkFrame):
             frame.grid(column=1, row=row, sticky='nsew', padx=2, pady=2)
             ctk.CTkLabel(frame,
                          text='',
-                         image=ctk.CTkImage(Image.open(f"./weather/weather_status_image/{icon}.png"), size=(30,30))).pack(side='left')
+                         image=ctk.CTkImage(Image.open(f"./weather_widget/weather_status_image/{icon}.png"), size=(30,30))).pack(side='left')
             ctk.CTkLabel(frame,
                          text=f"{avg_temp}\N{DEGREE SIGN}C",
-                         font = font ).pack(side ='left')
+                         font=themes_manager.get_ctk_font("default") ).pack(side ='left')
             row+=1
     
     
@@ -220,7 +235,7 @@ class Weather5DaysPanel(ctk.CTkFrame):
         self.create_temp_labels()
              
     def set_icon_based_on_weather_status(self, weather_ico):
-        image = ctk.CTkImage(Image.open(f"./weather/weather_status_image/{weather_ico}.png"), size=(50,50))
+        image = ctk.CTkImage(Image.open(f"./weather_widget/weather_status_image/{weather_ico}.png"), size=(50,50))
         self.ico_label.configure(image=image)
     
      

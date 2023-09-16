@@ -6,6 +6,7 @@ import random
 from notes_manager.note_manager_reciver import *
 from ICommand import *
 from invoker import *
+import themes_manager
 
 NOTE_BG = "#212529"
 NOTE_BORDER = "#343A40"
@@ -131,7 +132,7 @@ class NewNote(ctk.CTkFrame):
         """Initialize the title entry widget."""
         self.entry_title = ctk.CTkEntry(self,
                                         placeholder_text="Tytuł", 
-                                        font = ctk.CTkFont(family="Arial", size=20),
+                                        font = themes_manager.get_ctk_font("small_header"),
                                         fg_color="transparent",
                                         placeholder_text_color='white',
                                         border_width=0)
@@ -140,7 +141,7 @@ class NewNote(ctk.CTkFrame):
     def create_description_textbox(self):
         """Initialize the description textbox widget."""
         self.entry_description = ctk.CTkTextbox(self, 
-                                                font = ctk.CTkFont(family="Arial", size=15),
+                                                font = themes_manager.get_ctk_font("entry"),
                                                 fg_color="transparent")
         self.entry_description.grid(column=0, row=1, sticky='nsew', padx=10)
 
@@ -276,7 +277,7 @@ class NoteManagerNoteBar(ctk.CTkFrame):
         self.default_frame.pack(pady=15)
         self.default_frame.pack_propagate(False)
         
-        note_label = ctk.CTkLabel(self.default_frame, text="Utwórz notatkę...",font = ctk.CTkFont(family="Arial", size=25))
+        note_label = ctk.CTkLabel(self.default_frame, text="Utwórz notatkę...",font = themes_manager.get_ctk_font("small_header"))
         note_label.pack(side='left', padx=10)
         
         self.default_frame.bind("<Button-1>", self.on_focus)
@@ -435,7 +436,7 @@ class NoteTile(ctk.CTkFrame):
         """Initialize title entry."""
         self.entry_title = ctk.CTkLabel(self,
                                         text = self.title_text,
-                                        font=ctk.CTkFont(family="Arial", size=20),
+                                        font=themes_manager.get_ctk_font("small_header"),
                                         justify = 'left',
                                         anchor = 'w',
                                         fg_color="transparent",
@@ -445,7 +446,7 @@ class NoteTile(ctk.CTkFrame):
     def initialize_label_description(self):
         """Initialize description entry."""
         self.entry_description = ctk.CTkTextbox(self, 
-                                                font=ctk.CTkFont(family="Arial", size=15),
+                                                font=themes_manager.get_ctk_font("entry"),
                                                 
                                                 fg_color="transparent",
                                                 padx=2)

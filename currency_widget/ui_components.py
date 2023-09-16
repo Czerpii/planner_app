@@ -1,13 +1,14 @@
 
 import customtkinter as ctk
+from PIL import Image
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from .controller import CurrencyController
-
+import themes_manager
 
 class CurrencyCalculatorUI(ctk.CTkFrame):
     def __init__(self, parent, col, row):
-        super().__init__(parent, fg_color='black')
+        super().__init__(parent, fg_color="transparent")
         self.grid(column = col, row=row, sticky = "nsew", pady=5)
 
         self.controler = CurrencyController()
@@ -25,7 +26,7 @@ class CurrencyCalculatorUI(ctk.CTkFrame):
         self.rowconfigure((0,1), weight=1, uniform='a')
    
     def conversion_view(self):
-        frame = ctk.CTkFrame(self, fg_color='transparent', border_width=2, corner_radius=10)
+        frame = ctk.CTkFrame(self, fg_color=themes_manager.get_color('fg_frame'), border_color=themes_manager.get_color("border_entry"), border_width=2, corner_radius=10)
         frame.grid(column=0, row=0, sticky='nsew', padx=10, pady=10 )
         
         #setup layout
@@ -46,7 +47,7 @@ class CurrencyCalculatorUI(ctk.CTkFrame):
         self.create_action_buttons(frame, col=[5,8], row=2)
      
     def result_view(self):
-        frame = ctk.CTkFrame(self, fg_color='transparent', border_width=2, corner_radius=10)
+        frame = ctk.CTkFrame(self, fg_color=themes_manager.get_color('fg_frame'), border_color=themes_manager.get_color("border_entry"), border_width=2, corner_radius=10)
         frame.grid(column=0, row=1, sticky='nsew', padx=10, pady=10)
 
         #setup layout
@@ -60,7 +61,7 @@ class CurrencyCalculatorUI(ctk.CTkFrame):
     
     def create_conversion_labels(self, parent, col, row):
         
-        font = ctk.CTkFont(family='Arial', weight='bold', size=15)
+        font = themes_manager.get_ctk_font("default_bold")
         ctk.CTkLabel(parent, text="Kwota:", font=font).grid(column=col[0], row=row, sticky='sw')
         ctk.CTkLabel(parent, text="Przelicz z:", font=font).grid(column=col[1], row=row, sticky='sw')
         ctk.CTkLabel(parent, text="Przelicz na:",font=font).grid(column=col[2], row=row, sticky='sw',)
@@ -69,32 +70,64 @@ class CurrencyCalculatorUI(ctk.CTkFrame):
         
         currencies_name = self.controler.get_currency_code_and_name()
         
-        self.entry_value = ctk.CTkEntry(parent, placeholder_text='Podaj kwotę', justify ='right')
+        self.entry_value = ctk.CTkEntry(parent,
+                                        placeholder_text='Podaj kwotę',
+                                        font = themes_manager.get_ctk_font("entry"),
+                                        fg_color=themes_manager.get_color("entry"),
+                                        border_color=themes_manager.get_color("border_entry"),
+                                        justify ='right')
         self.entry_value.grid(column=col[0], row=row, columnspan=2, sticky='nw')
         
-        self.convert_from_label = ctk.CTkComboBox(parent, values=currencies_name, state='readonly', variable=self.convert_from_var)
+        self.convert_from_label = ctk.CTkComboBox(parent,
+                                                  font = themes_manager.get_ctk_font("entry"),
+                                                  fg_color=themes_manager.get_color("entry"),
+                                                  border_color=themes_manager.get_color("border_entry"),
+                                                  button_color=themes_manager.get_color("button"),
+                                                  button_hover_color=themes_manager.get_color("button_hover"),
+                                                  values=currencies_name,
+                                                  state='readonly',
+                                                  variable=self.convert_from_var)
         self.convert_from_var.set(currencies_name[0])
         self.convert_from_label.grid(column=col[1], row=row,columnspan=2, sticky='nwe')
         
-        self.convert_to_label = ctk.CTkComboBox(parent, values=currencies_name,state='readonly', variable=self.convert_to_var)
+        self.convert_to_label = ctk.CTkComboBox(parent,
+                                                font = themes_manager.get_ctk_font("entry"),
+                                                fg_color=themes_manager.get_color("entry"),
+                                                border_color=themes_manager.get_color("border_entry"),
+                                                button_color=themes_manager.get_color("button"),
+                                                button_hover_color=themes_manager.get_color("button_hover"),
+                                                values=currencies_name,
+                                                state='readonly',
+                                                variable=self.convert_to_var)
         self.convert_to_var.set(currencies_name[8])
         self.convert_to_label.grid(column=col[2], row=row,columnspan=2, sticky='nwe')
 
     def create_action_buttons(self, parent, col, row):
+        change_image = ctk.CTkImage(dark_image= Image.open("./button_image/change.png"),
+                                     light_image= Image.open("./button_image/change.png"))
         
-        
-        self.clear_button = ctk.CTkButton(parent, text='', command=self.replace_button_click)
-        self.clear_button.grid(column=col[0], row=row, sticky='n', padx=5)
+        self.switch_button = ctk.CTkButton(parent,
+                                          text='',
+                                          image=change_image,
+                                          fg_color=themes_manager.get_color("button"),
+                                          hover_color=themes_manager.get_color("button_hover"),
+                                          command=self.replace_button_click)
+        self.switch_button.grid(column=col[0], row=row, sticky='n', padx=5)
 
-        self.calculate_button = ctk.CTkButton(parent, text='Oblicz', command=self.calculate_button_click)
+        self.calculate_button = ctk.CTkButton(parent,
+                                              text='Oblicz',
+                                              font = themes_manager.get_ctk_font("button"),
+                                              fg_color=themes_manager.get_color("button"),
+                                              hover_color=themes_manager.get_color("button_hover"),
+                                              command=self.calculate_button_click)
         self.calculate_button.grid(column=col[1], row=row, sticky='nw', padx=3)
     
     def create_result_labels(self, parent, col, row):
         
-        self.result_value_label = ctk.CTkLabel(parent, text='', font=ctk.CTkFont(family='Arial', weight='bold', size=25))
+        self.result_value_label = ctk.CTkLabel(parent, text='', font=themes_manager.get_ctk_font("small_header"))
         self.result_value_label.grid(column=col, row=row[0], sticky='sew')
         
-        self.unit_value_label = ctk.CTkLabel(parent, text='',font=ctk.CTkFont(family='Arial', size=15))
+        self.unit_value_label = ctk.CTkLabel(parent, text='',font=themes_manager.get_ctk_font("default_bold"))
         self.unit_value_label.grid(column=col, row=row[1], sticky='new')
                
     def replace_button_click(self):
@@ -156,7 +189,7 @@ class CurrencyHistoryUi(ctk.CTkFrame):
         
     
     def chart_layout_view(self):
-        self.char_frame = ctk.CTkFrame(self, fg_color='gray')
+        self.char_frame = ctk.CTkFrame(self, fg_color=themes_manager.get_color("fg_frame"), corner_radius=10)
         self.char_frame.grid(column = 0, row = 0, sticky='nsew', padx=2)
         
         #layout
@@ -167,9 +200,9 @@ class CurrencyHistoryUi(ctk.CTkFrame):
         self.config_bar_chart_layout(self.char_frame)  
         
     def table_layout_view(self):
-        frame = ctk.CTkScrollableFrame(self, fg_color='gray')
+        frame = ctk.CTkScrollableFrame(self, fg_color=themes_manager.get_color("fg_frame"), corner_radius=10)
         frame.grid(column = 1, row=0, sticky='nsew', padx=2)
-        font = ctk.CTkFont(family='Arial Black', size=12)
+        font = themes_manager.get_ctk_font("default_bold")
         frame.columnconfigure((0,1,2), weight=1, uniform='a')
 
         ctk.CTkLabel(frame, text="Kod",font=font).grid(column=0, row=0, sticky='nsew', padx=2, pady=2)
@@ -181,7 +214,7 @@ class CurrencyHistoryUi(ctk.CTkFrame):
         
     def creates_data_labels_for_table(self, parent):
         code, sell, buy = self.controler.get_sell_and_but_rate()
-        font = ctk.CTkFont(family='Arial', size=12)
+        font = themes_manager.get_ctk_font("default")
         row = 1
         for c in code:
             ctk.CTkLabel(parent, text=c, font=font).grid(column=0, row=row, sticky='nsew', padx=2, pady=2)
@@ -201,21 +234,49 @@ class CurrencyHistoryUi(ctk.CTkFrame):
         
         currencies_name = self.controler.get_currency_code()
         
-        frame = ctk.CTkFrame(parent, fg_color='red')
+        frame = ctk.CTkFrame(parent, fg_color='transparent', corner_radius=10)
         frame.grid(column = 0, row=0, sticky='nsew')
     
-        self.convert_from_label = ctk.CTkComboBox(frame, values=currencies_name, state='readonly', variable=self.convert_from_var)
+        self.convert_from_label = ctk.CTkComboBox(frame,
+                                                font = themes_manager.get_ctk_font("entry"),
+                                                fg_color=themes_manager.get_color("entry"),
+                                                border_color=themes_manager.get_color("border_entry"),
+                                                button_color=themes_manager.get_color("button"),
+                                                button_hover_color=themes_manager.get_color("button_hover"),
+                                                values=currencies_name, state='readonly',
+                                                variable=self.convert_from_var)
         self.convert_from_var.set(currencies_name[8])
         self.convert_from_label.pack(side='left', fill='both', padx=2, pady=10)
 
-        self.convert_to_label = ctk.CTkComboBox(frame, values=currencies_name,state='readonly', variable=self.convert_to_var)
+        self.convert_to_label = ctk.CTkComboBox(frame,
+                                                font = themes_manager.get_ctk_font("entry"),
+                                                fg_color=themes_manager.get_color("entry"),
+                                                border_color=themes_manager.get_color("border_entry"),
+                                                button_color=themes_manager.get_color("button"),
+                                                button_hover_color=themes_manager.get_color("button_hover"),
+                                                values=currencies_name,state='readonly',
+                                                variable=self.convert_to_var)
         self.convert_to_var.set(currencies_name[0])
         self.convert_to_label.pack(side='left', fill='both', padx=2, pady=10)
         
-        self.draw_button = ctk.CTkButton(frame, text="Rysuj", command=self.draw_chart)
+        self.draw_button = ctk.CTkButton(frame,
+                                            font = themes_manager.get_ctk_font("button"),
+                                            fg_color=themes_manager.get_color("button"),
+                                            hover_color=themes_manager.get_color("button_hover"),
+                                            text="Rysuj",
+                                            command=self.draw_chart)
         self.draw_button.pack(side='right', fill='both', padx=2, pady=10)
     
-        self.chart_range = ctk.CTkComboBox(frame, values=['Tydzień', "Miesiąc", "Rok"], state='readonly', variable=self.chart_range_var, command=self.date_range_combobox_command)
+        self.chart_range = ctk.CTkComboBox(frame,
+                                            font = themes_manager.get_ctk_font("entry"),
+                                            fg_color=themes_manager.get_color("entry"),
+                                            border_color=themes_manager.get_color("border_entry"),
+                                            button_color=themes_manager.get_color("button"),
+                                            button_hover_color=themes_manager.get_color("button_hover"),
+                                            values=['Tydzień', "Miesiąc", "Rok"],
+                                            state='readonly', 
+                                            variable=self.chart_range_var, 
+                                            command=self.date_range_combobox_command)
         self.chart_range.pack(side='right', fill='both', padx=2, pady=10)
           
     def date_range_combobox_command(self, choice):

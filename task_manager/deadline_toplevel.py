@@ -3,12 +3,12 @@ from datetime import timedelta, date
 from tkcalendar import Calendar
 import customtkinter as ctk
 import tkinter as tk
-
+import themes_manager
 
 
 class DeadlineWindow(ctk.CTkToplevel):
     def __init__(self, parent, widget, callback_func):
-        super().__init__(parent )
+        super().__init__(parent, fg_color=themes_manager.get_color('background'))
         
         self.parent = parent
         self.widget= widget
@@ -115,22 +115,42 @@ class DeadlineWindow(ctk.CTkToplevel):
 
     def create_start_date_widget(self, col, row):
         
-        self.start_date = ctk.CTkEntry(self.info_frame, placeholder_text='Start')
+        self.start_date = ctk.CTkEntry(self.info_frame,
+                                       placeholder_text='Start',
+                                       font = themes_manager.get_ctk_font('entry'),
+                                       fg_color=themes_manager.get_color('entry'),
+                                       border_color=themes_manager.get_color('border_entry'),
+                                       border_width=1)
         self.start_date.grid(column=col, row=row, sticky='nsew', padx=10)
         
     def create_end_date_widget(self, col, row):
-        self.end_date = ctk.CTkEntry(self.info_frame, placeholder_text="Koniec")
+        self.end_date = ctk.CTkEntry(self.info_frame,
+                                     placeholder_text="Koniec",
+                                     font = themes_manager.get_ctk_font('entry'),
+                                       fg_color=themes_manager.get_color('entry'),
+                                       border_color=themes_manager.get_color('border_entry'),
+                                       border_width=1)
         self.end_date.grid(column = col, row=row, sticky='nsew', padx=10)
         
     def create_start_time_widget(self, col, row):
-        self.start_time = ctk.CTkEntry(self.info_frame,textvariable=self.start_time_var)
+        self.start_time = ctk.CTkEntry(self.info_frame,
+                                       textvariable=self.start_time_var,
+                                       font = themes_manager.get_ctk_font('entry'),
+                                       fg_color=themes_manager.get_color('entry'),
+                                       border_color=themes_manager.get_color('border_entry'),
+                                       border_width=1)
         self.start_time.grid(column=col, row=row, sticky='nsew', padx=10)
         
         self.start_time_var.trace_add('write', lambda *args: self.time_mask('start_time', *args))
         self.start_time.bind('<FocusIn>', self.set_cursor_at_start)
     
     def create_end_time_widget(self, col, row):
-        self.end_time = ctk.CTkEntry(self.info_frame, textvariable=self.end_time_var)
+        self.end_time = ctk.CTkEntry(self.info_frame,
+                                     textvariable=self.end_time_var,
+                                     font = themes_manager.get_ctk_font('entry'),
+                                       fg_color=themes_manager.get_color('entry'),
+                                       border_color=themes_manager.get_color('border_entry'),
+                                       border_width=1)
         self.end_time.grid(column=col, row=row, sticky='nsew', padx=10)
         
         self.end_time_var.trace_add('write', lambda *args: self.time_mask('end_time', *args))
@@ -138,18 +158,26 @@ class DeadlineWindow(ctk.CTkToplevel):
     
     def create_date_switch(self):
         
-        label = ctk.CTkLabel(self, text="Dodaj zakres")
+        label = ctk.CTkLabel(self, text="Dodaj zakres", font=themes_manager.get_ctk_font("button"))
         label.grid(column=0, row=2, sticky='nse', padx=10)
-        self.date_switch = ctk.CTkSwitch(self, text=None, command=self.switches_event,
+        self.date_switch = ctk.CTkSwitch(self,
+                                         text=None,
+                                         command=self.switches_event,
+                                         button_color=themes_manager.get_color("button"),
+                                         button_hover_color=themes_manager.get_color("button_hover"),
                                          variable=self.switch_date_var, onvalue='on', offvalue='off')
         
         self.date_switch.grid(column=1, row=2, sticky='nsew', padx=10)
     
     def create_time_switch(self):
-        label = ctk.CTkLabel(self, text="Dodaj czas")
+        label = ctk.CTkLabel(self, text="Dodaj czas", font=themes_manager.get_ctk_font("button"))
         label.grid(column=0, row=3, sticky='nse', padx=10)
         
-        self.time_switch = ctk.CTkSwitch(self, text=None, command=self.switches_event,
+        self.time_switch = ctk.CTkSwitch(self,
+                                         text=None,
+                                         command=self.switches_event,
+                                         button_color=themes_manager.get_color("button"),
+                                         button_hover_color=themes_manager.get_color("button_hover"),
                                          variable=self.switch_time_var, onvalue='on', offvalue='off')
         
         self.time_switch.grid(column=1, row=3, sticky='nsew', padx=10)
@@ -158,10 +186,18 @@ class DeadlineWindow(ctk.CTkToplevel):
         action_buttons_frame = ctk.CTkFrame(self, fg_color='transparent')
         action_buttons_frame.grid(column=0, row=4, columnspan=2, sticky='nsew', padx=10)
         
-        ok_button = ctk.CTkButton(action_buttons_frame, text='Ok', command=self.ok_button_click)
+        ok_button = ctk.CTkButton(action_buttons_frame,
+                                  text='Ok',
+                                  fg_color=themes_manager.get_color("button"),
+                                  hover_color=themes_manager.get_color("button_hover"),
+                                  command=self.ok_button_click)
         ok_button.pack(side='left', padx=2)
     
-        cancel_button = ctk.CTkButton(action_buttons_frame, text='Anuluj', command=self.cancel_button_click)
+        cancel_button = ctk.CTkButton(action_buttons_frame,
+                                    text='Anuluj',
+                                    fg_color=themes_manager.get_color("button"),
+                                    hover_color=themes_manager.get_color("button_hover"),  
+                                    command=self.cancel_button_click)
         cancel_button.pack(side='left', padx=2)
     #Class logic
     def time_mask(self, time_name, *args):

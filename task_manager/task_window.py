@@ -9,28 +9,14 @@ from task_manager.deadline_toplevel import *
 from ICommand import Save, Edit
 from invoker import Invoker
 from task_manager.task_manager_reciver import *
+import themes_manager
 
-# TOPLEVEL
-TOP_LEVEL_FG = "#1E1E1E"
 
 # FRAMES
 FRAME_FG = "#1E1E1E"
 FRAME_BORDER = "#282828"
 
-# ENTRIES
-ENTRY_FG = "#3A3A3A"
-ENTRY_TEXT = "#FFFFFF"
 
-# LABELS
-LABEL_FG = "#3A3A3A"
-LABEL_TEXT = "#FFFFFF"
-
-# BUTTONS
-BUTTON_FG = "#282828"
-BUTTON_HOVER = "#3A3A3A"
-
-# DESC
-DESC_FG = "#282828"
 
 
 class TaskWindow(ctk.CTkToplevel):
@@ -47,7 +33,7 @@ class TaskWindow(ctk.CTkToplevel):
             task_data: Data related to a task. Defaults to None. Provide to edit task
             selected_item_id: ID od the selected task. Defaults to None. Provide to edit task
         """
-        super().__init__(parent, fg_color=TOP_LEVEL_FG)
+        super().__init__(parent, fg_color=themes_manager.get_color("background"))
         
         
         self.cal_widget = None
@@ -61,7 +47,6 @@ class TaskWindow(ctk.CTkToplevel):
         self.task_manager_tiles_instance = task_manager_tiles_instance
         self.add_task = AddTaskParameters
 
-        self.name_font = ctk.CTkFont(family="Abril Fatface", size=30, weight="bold")
 
         self.setup_window()
         self.configure_layout()
@@ -92,26 +77,30 @@ class TaskWindow(ctk.CTkToplevel):
         """Create label and place on the windows"""
         ctk.CTkLabel(self,
                      text=text,
+                     font = themes_manager.get_ctk_font('default_bold'),
                      anchor='center',
                      corner_radius=5,
-                     fg_color=LABEL_FG,
-                     text_color=LABEL_TEXT,
+                     fg_color=themes_manager.get_color("fg_frame"),
                      ).grid(column=col, row=row, sticky='nsew', pady=2, padx=2)
 
     def create_title_entry(self, col, row):
         """Creates the title entry widget."""
         self.title_entry = ctk.CTkEntry(self,
                                         placeholder_text="Nazwa",
-                                        font=self.name_font,
+                                        font=themes_manager.get_ctk_font("header"),
                                         corner_radius=5,
-                                        fg_color=ENTRY_FG,
+                                        fg_color=themes_manager.get_color("entry"),
                                         border_width=0
                                         )
         self.title_entry.grid(row=0, column=0, columnspan=2, sticky='nsew', pady=2)
         
     def create_description_entry(self, col, row):
         """Creates the description textbox widget."""
-        self.desc_textbox = ctk.CTkTextbox(self, fg_color=DESC_FG, corner_radius=5)
+        self.desc_textbox = ctk.CTkTextbox(self, 
+                                           font = themes_manager.get_ctk_font('entry'),
+                                           fg_color=themes_manager.get_color('entry'),
+                                           border_color=themes_manager.get_color('border_entry'),
+                                           corner_radius=5)
         self.desc_textbox.grid(column=col, row=row, sticky="nsew", pady=2, padx=2)
     
     def create_status_button(self, col, row, text="Nie rozpoczęto"):
@@ -119,8 +108,9 @@ class TaskWindow(ctk.CTkToplevel):
         self.status_list = ctk.CTkButton(self,
                                          text=text,
                                          command=self.status_list_button_click,
-                                         fg_color=BUTTON_FG,
-                                         hover_color=BUTTON_HOVER,
+                                         font=themes_manager.get_ctk_font("entry"),
+                                         fg_color=themes_manager.get_color('fg_frame'),
+                                         hover_color=themes_manager.get_color('fg_hover_frame'),
                                          corner_radius=5)
         self.status_list.grid(column=col, row=row, sticky="nsew", pady=2, padx=2)
     
@@ -135,16 +125,18 @@ class TaskWindow(ctk.CTkToplevel):
         self.start_button = ctk.CTkButton(frame,
                                          text=text_start,
                                          command=lambda: self.open_calendar_button_click(self.start_button),
-                                         fg_color=BUTTON_FG,
-                                         hover_color=BUTTON_HOVER,
+                                         font=themes_manager.get_ctk_font("entry"),
+                                         fg_color=themes_manager.get_color('fg_frame'),
+                                         hover_color=themes_manager.get_color('fg_hover_frame'),
                                          corner_radius=5)
         self.start_button.grid(column=0, row=0, sticky='nsew')
         
         self.end_button = ctk.CTkButton(frame,
                                          text=text_end,
                                          command= lambda: self.open_calendar_button_click(self.end_button),
-                                         fg_color=BUTTON_FG,
-                                         hover_color=BUTTON_HOVER,
+                                         font=themes_manager.get_ctk_font("entry"),
+                                         fg_color=themes_manager.get_color('fg_frame'),
+                                         hover_color=themes_manager.get_color('fg_hover_frame'),
                                          corner_radius=5)
         self.end_button.grid(column=0, row=1, sticky='nsew')
               
@@ -153,8 +145,9 @@ class TaskWindow(ctk.CTkToplevel):
         self.priority_list = ctk.CTkButton(self,
                                            text=text,
                                            command=self.priority_list_button_click,
-                                           fg_color=BUTTON_FG,
-                                           hover_color=BUTTON_HOVER,
+                                           font=themes_manager.get_ctk_font("entry"),
+                                           fg_color=themes_manager.get_color('fg_frame'),
+                                           hover_color=themes_manager.get_color('fg_hover_frame'),
                                            corner_radius=5)
         self.priority_list.grid(column=col, row=row, sticky="nsew", pady=2, padx=2)
      
@@ -163,8 +156,9 @@ class TaskWindow(ctk.CTkToplevel):
         self.tag_list = ctk.CTkButton(self,
                                       text=text,
                                       command=self.tag_list_button_click,
-                                      fg_color=BUTTON_FG,
-                                      hover_color=BUTTON_HOVER)
+                                      font=themes_manager.get_ctk_font("entry"),
+                                      fg_color=themes_manager.get_color('fg_frame'),
+                                      hover_color=themes_manager.get_color('fg_hover_frame'))
         self.tag_list.grid(column=col, row=row, sticky="nsew", pady=2, padx=2)
     
     def setup_labels(self):
@@ -212,15 +206,17 @@ class TaskWindow(ctk.CTkToplevel):
         self.save_button = ctk.CTkButton(buttons_frame,
                                          text="Zapisz",
                                          command=self.save_task_button_click,
-                                         fg_color=BUTTON_FG,
-                                         hover_color=BUTTON_HOVER,
+                                         font=themes_manager.get_ctk_font("button"),
+                                         fg_color=themes_manager.get_color('button'),
+                                         hover_color=themes_manager.get_color('button_hover'),
                                          corner_radius=5)
         self.save_button.pack(side='left', padx=4, fill='x', expand='true')
         self.cancel_button = ctk.CTkButton(buttons_frame,
                                            text="Anuluj",
                                            command=lambda: self.destroy(),
-                                           fg_color=BUTTON_FG,
-                                           hover_color=BUTTON_HOVER,
+                                           font=themes_manager.get_ctk_font("button"),
+                                             fg_color=themes_manager.get_color('button'),
+                                            hover_color=themes_manager.get_color('button_hover'),
                                            corner_radius=5)
         self.cancel_button.pack(side='left', padx=4, fill='x', expand='true')
     
@@ -312,7 +308,7 @@ class TaskWindow(ctk.CTkToplevel):
 
 class AddTaskParameters(ctk.CTkToplevel):
     def __init__(self, parent, data_name, new_task_window_instance):
-        super().__init__(parent)
+        super().__init__(parent, fg_color=themes_manager.get_color("background"))
         self.entry_box = None
         self.button_parameters = None
         self.parent = new_task_window_instance
@@ -379,14 +375,20 @@ class AddTaskParameters(ctk.CTkToplevel):
 
                 self.button_parameters = ctk.CTkButton(record_frame,
                                                        text=''.join(self.data_list[i]),
-                                                       fg_color='transparent',
+                                                       font=themes_manager.get_ctk_font("button"),
+                                                       fg_color=themes_manager.get_color("button"),
+                                                        hover_color=themes_manager.get_color("button_hover"),
                                                        command=lambda button_text=self.data_list[i][
                                                            0]: self.button_parameters_clicked(button_text)
                                                        ).pack(side='left')
                 record_frame.pack(pady=2.5)
                 
         elif self.data_name == 'tag':
-            self.entry_box = ctk.CTkEntry(self, state='normal', placeholder_text="Wpisz nowy")
+            self.entry_box = ctk.CTkEntry(self, state='normal',
+                                          placeholder_text="Wpisz nowy",
+                                          font=themes_manager.get_ctk_font("entry"),
+                                          fg_color=themes_manager.get_color("entry"),
+                                          border_color=themes_manager.get_color("border_entry"))
             self.entry_box.pack(fill='x', pady=2.5)
             self.entry_box.bind('<Return>', lambda event: self.add_new())
 
@@ -395,12 +397,16 @@ class AddTaskParameters(ctk.CTkToplevel):
 
                 self.button_parameters = ctk.CTkButton(record_frame,
                                                        text=''.join(self.data_list[i]),
-                                                       fg_color='transparent',
+                                                       fg_color=themes_manager.get_color("button"),
+                                                       font=themes_manager.get_ctk_font("button"),
+                                                         hover_color=themes_manager.get_color("button_hover"),
                                                        command=lambda button_text=self.data_list[i][
                                                            0]: self.button_parameters_clicked(button_text)
                                                        ).pack(side='left')
                 ctk.CTkButton(record_frame,
                               text="x",
+                              fg_color=themes_manager.get_color("button"),
+                            hover_color=themes_manager.get_color("button_hover"),
                               command=lambda parameters=record_frame,
                                              index=self.data_list[i][0]: self.button_delete_clicked(parameters, index),
                               width=10).pack(side='left')
@@ -439,10 +445,13 @@ class AddTaskParameters(ctk.CTkToplevel):
         record_frame = ctk.CTkFrame(self)
         ctk.CTkButton(record_frame,
                       text=temp,
-                      fg_color="transparent",
+                      fg_color=themes_manager.get_color("button"),
+                      hover_color=themes_manager.get_color("button_hover"),
                       command=lambda button_text=temp: self.button_parameters_clicked(button_text)).pack(side='left')
         ctk.CTkButton(record_frame,
                       text='x',
+                      fg_color=themes_manager.get_color("button"),
+                      hover_color=themes_manager.get_color("button_hover"),
                       command=lambda parameters=record_frame, index=temp: self.button_delete_clicked(parameters, index),
                       width=10).pack(side='left')
         record_frame.pack(pady=2.5)
