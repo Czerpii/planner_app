@@ -7,13 +7,27 @@ from datetime import datetime
 
 
 class TimeZone():
+    """
+    A class for managing time zones and displaying time information.
+    """
     def __init__(self):
+        """
+        Initializes a TimeZone instance.
+        """
         self.update_time = True
         self.after_id = None
         self.api_url = "http://worldtimeapi.org/api/timezone/"
         
     def get_cities(self, region): 
-        
+        """
+        Get a list of cities in the specified region.
+
+        Args:
+            region (str): The name of the region.
+
+        Returns:
+            list: A list of city names in the region.
+        """
         if region == "Oceania":
             response = requests.get(f"{self.api_url}Australia")
             response1 = requests.get(f"{self.api_url}Atlantic")
@@ -35,7 +49,15 @@ class TimeZone():
         return timezones
 
     def get_actuall_timezone(self, return_type = 'both'):
-        
+        """
+        Get the actual (user's) timezone information.
+
+        Args:
+            return_type (str, optional): The type of information to return ('region', 'city', or 'both').
+
+        Returns:
+            str: The timezone information based on the return_type.
+        """
         response = requests.get("http://worldtimeapi.org/api/ip")    
         return_request = response.json()
         default_tm = return_request.get("timezone")
@@ -52,26 +74,44 @@ class TimeZone():
             
     
     def display_time(self, timezone_str, widget):
-       
-        if self.update_time == False:
+        """
+        Display the current time in the specified timezone.
+
+        Args:
+            timezone_str (str): The timezone identifier.
+            widget: The widget to display the time.
+
+        Notes:
+            This method updates the widget with the current time every second.
+        """
+        if self.update_time is False:
             return 
         
         timezone = pytz.timezone(timezone_str)
         now = datetime.now(timezone)
         formatted_time = now.strftime('%H:%M:%S %p')
-        widget.configure(text = formatted_time)
+        widget.configure(text=formatted_time)
         self.after_id = widget.after(1000, self.display_time, timezone_str, widget)
             
     def get_current_date_with_weekday(self, timezone_str):
+        """
+        Get the current date with the weekday in the specified timezone.
+
+        Args:
+            timezone_str (str): The timezone identifier.
+
+        Returns:
+            str: A formatted date string including the weekday.
+        """
         days_translation = {
-        'Monday': 'Poniedziałek',
-        'Tuesday': 'Wtorek',
-        'Wednesday': 'Środa',
-        'Thursday': 'Czwartek',
-        'Friday': 'Piątek',
-        'Saturday': 'Sobota',
-        'Sunday': 'Niedziela'
-    }
+            'Monday': 'Poniedziałek',
+            'Tuesday': 'Wtorek',
+            'Wednesday': 'Środa',
+            'Thursday': 'Czwartek',
+            'Friday': 'Piątek',
+            'Saturday': 'Sobota',
+            'Sunday': 'Niedziela'
+        }
     
         timezone = pytz.timezone(timezone_str)
         current_datetime = datetime.now(timezone)
@@ -81,22 +121,39 @@ class TimeZone():
         formatted_date = current_datetime.strftime(f'{day_polish} %d-%m-%Y')
         return formatted_date
         
-    
-    
     def stop_display_time(self, widget):
+        """
+        Stop updating the time display.
+
+        Args:
+            widget: The widget displaying the time.
+        """
         if self.after_id:
             widget.after_cancel(self.after_id)
-            self._after_id = None
+            self.after_id = None
         self.update_time = False
         
-        
     def start_display_time(self, timezone, widget):
-        self.update_time=True
+        """
+        Start updating the time display.
+
+        Args:
+            timezone (str): The timezone identifier.
+            widget: The widget to display the time.
+        """
+        self.update_time = True
         self.display_time(timezone_str=timezone, widget=widget)
-        
 
+def show_actual_time(widget):
+    """
+    Display the actual time in a widget.
 
-def show_actuall_time(widget):
-        time = tm.strftime('%H:%M:%S')
-        widget.configure(text = time)
-        widget.after(200, show_actuall_time, widget)
+    Args:
+        widget: The widget to display the time.
+
+    Notes:
+        This function updates the widget with the current time every 200 milliseconds.
+    """
+    time = tm.strftime('%H:%M:%S')
+    widget.configure(text=time)
+    widget.after(200, show_actual_time, widget)
