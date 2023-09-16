@@ -1,4 +1,5 @@
 
+import os
 import customtkinter as ctk
 from info_bar import *
 from buttons_bar import *
@@ -26,7 +27,9 @@ class Main(ctk.CTk):
         self.change_title_bar_color()
         self.set_geometry_and_center(1080, 720)
         self.title('')
-        self.set_icon('./empty.ico')
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        icon_path = os.path.join(current_directory, 'empty.ico')
+        self.set_icon(icon_path)
 
     def set_icon(self, icon_path):
         """Set the window's icon.

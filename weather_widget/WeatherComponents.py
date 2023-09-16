@@ -153,7 +153,11 @@ class WeatherDailyPanel(ctk.CTkFrame):
         self.after(interval, self.start_updating_weather, interval)
     
     def set_icon_based_on_weather_status(self, weather_ico):
-        image = ctk.CTkImage(Image.open(f"./weather_widget/weather_status_image/{weather_ico}.png"), size=(50,50))
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        
+        icon_path = os.path.join(current_directory, f"weather_status_image/{weather_ico}.png")
+
+        image = ctk.CTkImage(Image.open(icon_path), size=(50,50))
         self.ico_label.configure(image=image)
         
     
@@ -206,17 +210,19 @@ class Weather5DaysPanel(ctk.CTkFrame):
     
     def create_temp_labels(self):
         row=0
-        font = ctk.CTkFont(family='Arial Black', size=12)
+        
         
         for key, value in self.default_weather.items():
             avg_temp = value['średnia_temperatura']
             icon = value['icon']
+            current_directory = os.path.dirname(os.path.abspath(__file__))
+            icon_path = os.path.join(current_directory, f"weather_status_image/{icon}.png")
             
             frame  = ctk.CTkFrame(self, fg_color='transparent')
             frame.grid(column=1, row=row, sticky='nsew', padx=2, pady=2)
             ctk.CTkLabel(frame,
                          text='',
-                         image=ctk.CTkImage(Image.open(f"./weather_widget/weather_status_image/{icon}.png"), size=(30,30))).pack(side='left')
+                         image=ctk.CTkImage(Image.open(icon_path), size=(30,30))).pack(side='left')
             ctk.CTkLabel(frame,
                          text=f"{avg_temp}\N{DEGREE SIGN}C",
                          font=themes_manager.get_ctk_font("default") ).pack(side ='left')
@@ -235,7 +241,12 @@ class Weather5DaysPanel(ctk.CTkFrame):
         self.create_temp_labels()
              
     def set_icon_based_on_weather_status(self, weather_ico):
-        image = ctk.CTkImage(Image.open(f"./weather_widget/weather_status_image/{weather_ico}.png"), size=(50,50))
+        
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+
+        icon_path = os.path.join(current_directory, f"weather_widget/weather_status_image/{weather_ico}.png")
+
+        image = ctk.CTkImage(Image.open(icon_path), size=(50,50))
         self.ico_label.configure(image=image)
     
      
