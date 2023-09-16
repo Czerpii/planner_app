@@ -1,4 +1,5 @@
 
+import os
 import customtkinter as ctk
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -103,9 +104,12 @@ class CurrencyCalculatorUI(ctk.CTkFrame):
         self.convert_to_label.grid(column=col[2], row=row,columnspan=2, sticky='nwe')
 
     def create_action_buttons(self, parent, col, row):
-        change_image = ctk.CTkImage(dark_image= Image.open("./button_image/change.png"),
-                                     light_image= Image.open("./button_image/change.png"))
         
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        change_image_path = os.path.join(current_directory, "../button_image/change.png")
+        change_image = ctk.CTkImage(dark_image=Image.open(change_image_path),
+                                    light_image=Image.open(change_image_path))
+                
         self.switch_button = ctk.CTkButton(parent,
                                           text='',
                                           image=change_image,

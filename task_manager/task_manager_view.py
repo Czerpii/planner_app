@@ -1,5 +1,6 @@
 
 from typing import Optional, Tuple, Union
+import os
 import customtkinter as ctk
 from tkinter import ttk
 from PIL import Image
@@ -388,9 +389,11 @@ class TaskManagerButtonBar(ctk.CTkFrame):
         self.columnconfigure(10, weight=1, uniform='a')
         
         #add images - zmienic na ctkimage
-        change_image = ctk.CTkImage(dark_image= Image.open("./button_image/change.png"),
-                                     light_image= Image.open("./button_image/change.png"))
-        
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        change_image_path = os.path.join(current_directory, "../button_image/change.png")
+        change_image = ctk.CTkImage(dark_image=Image.open(change_image_path),
+                                    light_image=Image.open(change_image_path))
+                
         ####buttons#####
         #new task button - open new window
         self.new_task_button =self.create_button(text = "Nowy", row=0,column=0, command=self.open_new_task_window, image=None)

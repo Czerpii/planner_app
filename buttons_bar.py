@@ -1,4 +1,5 @@
 
+import os
 import customtkinter as ctk
 from PIL import Image
 from task_manager.task_manager_view import TaskManagerMain
@@ -41,9 +42,13 @@ class ButtonsBar(ctk.CTkFrame):
         self.rowconfigure(0, weight=1, uniform='a')
         self.columnconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1, uniform='a')
         # Image setup for buttons
-        task_image = self.load_image("./button_image/tasks.png", (35, 35))
-        note_image = self.load_image("./button_image/note.png", (35, 35))
-        currency_image = self.load_image("./button_image/currency.png", (35,35))
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        task_image_path = os.path.join(current_directory, "button_image/tasks.png")
+        note_image_path = os.path.join(current_directory, "button_image/note.png")
+        currency_image_path = os.path.join(current_directory, "button_image/currency.png")
+        task_image = self.load_image(task_image_path, (35, 35))
+        note_image = self.load_image(note_image_path, (35, 35))
+        currency_image = self.load_image(currency_image_path, (35, 35))
         # TaskManager Button
         self.task_manager_button = self.create_button(task_image, self.task_manager_button_click)
         self.task_manager_button.grid(column=0, row=0, sticky='ns', padx=5, pady=2)
