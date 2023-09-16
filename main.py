@@ -1,6 +1,5 @@
 
 import customtkinter as ctk
-from settings import *
 from info_bar import *
 from buttons_bar import *
 from task_manager.task_manager_view import TaskManagerMain
@@ -25,7 +24,7 @@ class Main(ctk.CTk):
     def setup_window(self):
         """Configure the main window's appearance and behavior."""
         self.change_title_bar_color()
-        self.set_geometry_and_center(WIDTH, HEIGHT)
+        self.set_geometry_and_center(1080, 720)
         self.title('')
         self.set_icon('./empty.ico')
 

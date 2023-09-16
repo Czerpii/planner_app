@@ -1,5 +1,4 @@
 import requests
-from settings import *
 from weather_widget.IWeatherProvider import*
 from datetime import datetime, date
 import ssl
