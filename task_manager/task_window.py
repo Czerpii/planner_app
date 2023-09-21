@@ -314,7 +314,7 @@ class AddTaskParameters(ctk.CTkToplevel):
         self.parent = new_task_window_instance
         self.data_name = data_name
         
-        singleton = UserSingleton()
+        singleton = UserManager()
         self.pathname = singleton.folder_path
         self.data_file = os.path.join(self.pathname, f"{data_name}.csv")
         self.data_list = []
@@ -344,19 +344,15 @@ class AddTaskParameters(ctk.CTkToplevel):
 
     def check_cursor_position(self, widget):
         widget = widget
-        # Pobierz aktualne współrzędne i wymiary okna
         x = widget.winfo_x()
         y = widget.winfo_y()
         width = widget.winfo_width()
         height = widget.winfo_height()
 
-        # Pobierz aktualne współrzędne kursora myszy
         mouse_x = widget.winfo_pointerx()
         mouse_y = widget.winfo_pointery()
-
-        # Sprawdź, czy kursor myszy jest wewnątrz okna
+        
         if not (x <= mouse_x <= x + width and y <= mouse_y <= y + height):
-            # Jeżeli kursor myszy jest poza oknem, zniszcz okno
             widget.destroy()
 
     def import_data_from_csv_file(self):

@@ -22,7 +22,6 @@ class CurrencyApi:
         """
         return f"http://api.nbp.pl/api/exchangerates/{parameters}?format=json"
     
-    
     def fetch_currency_table_A(self):
         """
         Fetch currency exchange rate data from NBP for table A.

@@ -72,7 +72,6 @@ class TimeZone():
         else:
             raise ValueError("Invalid return_type. Choose from 'region', 'city', or 'both'.")
             
-    
     def display_time(self, timezone_str, widget):
         """
         Display the current time in the specified timezone.

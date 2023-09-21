@@ -2,7 +2,7 @@ import json
 import csv
 import os
 import pyAesCrypt
-from UserSingleton import UserSingleton
+from UserSingleton import UserManager
 
 class TaskManager:
     """
@@ -13,7 +13,7 @@ class TaskManager:
         """
         Initializes a TaskManager instance.
         """
-        singleton = UserSingleton()
+        singleton = UserManager()
         self.pathname = singleton.folder_path
         self.bufferSize = 64 * 1024
         self.password = singleton.password

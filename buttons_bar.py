@@ -12,7 +12,6 @@ class ButtonsBar(ctk.CTkFrame):
     Class representing the ButtonsBar frame. This frame provides buttons for switching
     between different views
     """
-    
     def __init__(self, parent, col, row):
         """Initialize the ButtonsBar frame.
 

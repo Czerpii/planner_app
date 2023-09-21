@@ -3,7 +3,6 @@ import os
 import customtkinter as ctk
 from info_bar import *
 from buttons_bar import *
-from task_manager.task_manager_view import TaskManagerMain
 from users_management.user_management_view import *
 import themes_manager
 
@@ -74,17 +73,15 @@ class Main(ctk.CTk):
         """Create and configure UI elements for the main view."""
         self.configure_grid_main_view()
         InfoBar(self, col=1, row=0, rowspan=2)
-        buttons_bar = ButtonsBar(self, 0, 0)
-        # default_view = TaskManagerMain(self, 0, 1)
-        # buttons_bar.switch_view(default_view)
-
+        ButtonsBar(self, 0, 0)
+        
     def configure_grid_main_view(self):
         """Configure grid settings for the main view layout."""
         self.columnconfigure(0, weight=5, uniform='a')
         self.columnconfigure(1, weight=1, uniform='a')
         self.rowconfigure(0, weight=1, uniform='a')
         self.rowconfigure(1, weight=15, uniform='a')
-        self.configure(fg_color=themes_manager.get_color('background'))
+        
 
     def main_view(self, instance):
         """Display the main application view.

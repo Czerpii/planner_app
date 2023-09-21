@@ -18,7 +18,7 @@ class Users:
         """
         self.view_instance = parent
         self.pathname = os.path.join(os.path.dirname(os.path.realpath(__file__)), "users.json")
-        self.singleton = UserSingleton()
+        self.singleton = UserManager()
 
     def save_user(self, users):
         """

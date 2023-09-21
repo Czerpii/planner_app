@@ -20,7 +20,7 @@ class NoteManager():
             temp_file (str): The path to the temporary unencrypted file used for operations.
             headers (list): The headers for the CSV file.
         """
-        singleton = UserSingleton()
+        singleton = UserManager()
         self.pathname = singleton.folder_path
         self.bufferSize = 64 * 1024
         self.password = singleton.password

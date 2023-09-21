@@ -1,6 +1,6 @@
 import os
 
-class UserSingleton:
+class UserManager:
     """
     Singleton class representing a user. This class ensures that only one instance
     of the user is created throughout the application's lifecycle.
@@ -23,7 +23,7 @@ class UserSingleton:
             UserSingleton: The single instance of the UserSingleton class.
         """
         if cls._instance is None:
-            cls._instance = super(UserSingleton, cls).__new__(cls)
+            cls._instance = super(UserManager, cls).__new__(cls)
         return cls._instance
     
     @classmethod
@@ -43,7 +43,6 @@ class UserSingleton:
         # Create the folder if it doesn't exist
         if not os.path.exists(cls.folder_path):
             os.makedirs(cls.folder_path)
-        
     
     @classmethod
     def set_password(cls, password):

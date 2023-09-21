@@ -432,7 +432,6 @@ class TaskManagerTiles(ctk.CTkFrame):
         """
         return self.selected_tile_id          
         
-
 class TilesCreator(ctk.CTkFrame):
     """
     A class for creating task tiles in the TaskManagerTiles view.
@@ -513,7 +512,6 @@ class TilesCreator(ctk.CTkFrame):
 
         self.configure(fg_color=themes_manager.get_color('tile_hover'))
         self.task_manager_tiles.selected_tile_id = self.id_task_tile
-
 
 class TaskManagerButtonBar(ctk.CTkFrame):
     """
@@ -616,7 +614,7 @@ class TaskManagerButtonBar(ctk.CTkFrame):
         else:
             self.toplevel_window.focus()
 
-        singleton = UserSingleton()
+        singleton = UserManager()
 
     def edit_task_button_click(self):
         """
