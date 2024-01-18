@@ -11,7 +11,7 @@ try:
 except ImportError:
     pass
 
-class Main(ctk.CTk):
+class Main(ctk.CTk): 
     """Main application window class."""
     
     def __init__(self):
